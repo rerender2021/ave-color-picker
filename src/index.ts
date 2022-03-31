@@ -1,15 +1,15 @@
-import { App, WindowCreation, Window, WindowFlag, Grid, Button } from 'ave-ui';
+import { App, WindowCreation, Window, WindowFlag, Grid, Button, Picture, ResourceSource } from 'ave-ui';
+import * as path from "path";
+import * as fs from "fs";
 
 export function main(window: Window) {
-    const button = new Button(window);
-    button.SetText("Button");
-    button.OnClick(sender => {
-        sender.SetText("Button Clicked");
-        console.log("button clicked");
-    });
+    const picture = new Picture(window);
+    const buffer = fs.readFileSync(path.resolve(__dirname, "./FileOpen#6.png"));
+    const source = ResourceSource.FromBuffer(buffer);
+    picture.SetPicture(source);
 
     const container = get3x3Grid(window);
-    container.ControlAdd(button).SetGrid(1, 1)
+    container.ControlAdd(picture).SetGrid(1, 1)
     window.SetContent(container);
 }
 
@@ -39,7 +39,7 @@ export function run(main: Function) {
     window.Activate();
 }
 
-export function get3x3Grid(window: Window, width = 120, height = 32) {
+export function get3x3Grid(window: Window, width = 500, height = 500) {
     const container = new Grid(window);
     container.ColAddSlice(1);
     container.ColAddDpx(width);
