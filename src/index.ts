@@ -76,3 +76,4 @@ globalThis.program = new Program();
 globalThis.program.run();
 
 // TODO: use page to wrap big picrue
+// use textbox and readonly=true to allow copy color
