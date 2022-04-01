@@ -7,6 +7,8 @@ import {
   ResourceSource,
   Label,
   AlignType,
+  ColorView,
+  Vec4,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
@@ -50,32 +52,19 @@ class Program {
       const source = ResourceSource.FromBuffer(pictureBuffer);
       picture.SetPicture(source);
 
-      const pixel = new Picture(window);
+      const colorView = new ColorView(window);
       picture.OnPointerMove((sender, mp) => {
         const pos = mp.Position;
         const color = readPixel(png, pos.x, pos.y);
         console.log(pos, color);
 
-        const pixelPNG = new PNG({ width: 100, height: 100 });
-        for (let y = 0; y < pixelPNG.height; y++) {
-          for (var x = 0; x < pixelPNG.width; x++) {
-            const i = (pixelPNG.width * y + x) * 4;
-            pixelPNG.data[i] = color.r;
-            pixelPNG.data[i + 1] = color.g;
-            pixelPNG.data[i + 2] = color.b;
-            pixelPNG.data[i + 3] = color.a;
-          }
-        }
-
-        const pixelBuffer = PNG.sync.write(pixelPNG);
-        const source = ResourceSource.FromBuffer(pixelBuffer);
-        pixel.SetPicture(source);
+        colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
         label.SetText(`rgba:(${color.r},${color.g},${color.b},${color.a})`);
       });
 
       const container = getGrid(window, png.width, png.height);
       container.ControlAdd(picture).SetGrid(1, 1);
-      container.ControlAdd(pixel).SetGrid(3, 1);
+      container.ControlAdd(colorView).SetGrid(3, 1);
       container.ControlAdd(label).SetGrid(3, 2);
       window.SetContent(container);
       return true;
@@ -86,4 +75,4 @@ class Program {
 globalThis.program = new Program();
 globalThis.program.run();
 
-// TODO: use native image to update pixel view
+// TODO: use page to wrap big picrue
