@@ -12,13 +12,16 @@ export function readPixel(png: PNG, x: number, y: number) {
   };
 }
 
-export function get3x3Grid(window: Window, width = 500, height = 500) {
+export function getGrid(window: Window, width = 500, height = 500) {
   const container = new Grid(window);
   container.ColAddSlice(1);
+  container.ColAddDpx(width);
+  container.ColAddDpx(200);
   container.ColAddDpx(width);
   container.ColAddSlice(1);
 
   container.RowAddSlice(1);
+  container.RowAddDpx(height);
   container.RowAddDpx(height);
   container.RowAddSlice(1);
   return container;

@@ -9,7 +9,7 @@ import {
 import * as path from "path";
 import * as fs from "fs";
 import { PNG } from "pngjs";
-import { get3x3Grid, readPixel } from "./utils";
+import { getGrid, readPixel } from "./utils";
 
 class Program {
   app: App;
@@ -35,7 +35,9 @@ class Program {
 
   OnCreateContent() {
     //
-    const pictureBuffer = fs.readFileSync(path.resolve(__dirname, "./square.png"));
+    const pictureBuffer = fs.readFileSync(
+      path.resolve(__dirname, "./square.png")
+    );
     const png = PNG.sync.read(pictureBuffer);
 
     this.window.OnCreateContent((window) => {
@@ -43,14 +45,31 @@ class Program {
       const source = ResourceSource.FromBuffer(pictureBuffer);
       picture.SetPicture(source);
 
+      const pixel = new Picture(window);
       picture.OnPointerMove((sender, mp) => {
         const pos = mp.Position;
         const color = readPixel(png, pos.x, pos.y);
         console.log(pos, color);
+
+        const pixelPNG = new PNG({ width: 100, height: 100 });
+        for (let y = 0; y < pixelPNG.height; y++) {
+          for (var x = 0; x < pixelPNG.width; x++) {
+            const i = (pixelPNG.width * y + x) * 4;
+            pixelPNG.data[i] = color.r;
+            pixelPNG.data[i + 1] = color.g;
+            pixelPNG.data[i + 2] = color.b;
+            pixelPNG.data[i + 3] = color.a;
+          }
+        }
+
+        const pixelBuffer = PNG.sync.write(pixelPNG);
+        const source = ResourceSource.FromBuffer(pixelBuffer);
+        pixel.SetPicture(source);
       });
 
-      const container = get3x3Grid(window, png.width, png.height);
+      const container = getGrid(window, png.width, png.height);
       container.ControlAdd(picture).SetGrid(1, 1);
+      container.ControlAdd(pixel).SetGrid(3, 1);
       window.SetContent(container);
       return true;
     });
