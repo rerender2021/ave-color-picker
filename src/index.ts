@@ -5,6 +5,8 @@ import {
   WindowFlag,
   Picture,
   ResourceSource,
+  Label,
+  AlignType,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
@@ -41,6 +43,9 @@ class Program {
     const png = PNG.sync.read(pictureBuffer);
 
     this.window.OnCreateContent((window) => {
+      const label = new Label(window);
+      label.SetAlignHorz(AlignType.Center);
+
       const picture = new Picture(window);
       const source = ResourceSource.FromBuffer(pictureBuffer);
       picture.SetPicture(source);
@@ -65,11 +70,13 @@ class Program {
         const pixelBuffer = PNG.sync.write(pixelPNG);
         const source = ResourceSource.FromBuffer(pixelBuffer);
         pixel.SetPicture(source);
+        label.SetText(`rgba:(${color.r},${color.g},${color.b},${color.a})`);
       });
 
       const container = getGrid(window, png.width, png.height);
       container.ControlAdd(picture).SetGrid(1, 1);
       container.ControlAdd(pixel).SetGrid(3, 1);
+      container.ControlAdd(label).SetGrid(3, 2);
       window.SetContent(container);
       return true;
     });
@@ -78,3 +85,5 @@ class Program {
 
 globalThis.program = new Program();
 globalThis.program.run();
+
+// TODO: use native image to update pixel view
