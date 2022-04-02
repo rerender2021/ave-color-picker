@@ -1,7 +1,7 @@
 {
-  "name": "ave-nodejs-template",
+  "name": "ave-color-picker",
   "version": "1.0.0",
-  "description": "quick start for ave-ui",
+  "description": "",
   "main": "src/index.js",
   "bin": "build/index.js",
   "scripts": {
@@ -11,7 +11,8 @@
   },
   "pkg": {
     "assets": [
-      "node_modules\\ave-ui\\lib\\Avernakis-Nodejs.node"
+      "node_modules\\ave-ui\\lib\\Avernakis-Nodejs.node",
+      "build\\square.png"
     ],
     "targets": [
       "node14-win-x64"
