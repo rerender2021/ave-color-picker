@@ -7,17 +7,7 @@
   "scripts": {
     "dev": "tsnd --respawn ./src/index.ts",
     "build": "tsc",
-    "package": "npm run build && pkg package.json"
-  },
-  "pkg": {
-    "assets": [
-      "node_modules\\ave-ui\\lib\\Avernakis-Nodejs.node",
-      "build\\square.png"
-    ],
-    "targets": [
-      "node14-win-x64"
-    ],
-    "outputPath": "bin"
+    "release": "npm run build && pkg --output ./bin/color-picker.exe --config pkg.config.json ./build/index.js "
   },
   "author": "",
   "license": "MIT",
@@ -31,6 +21,7 @@
   "dependencies": {
     "ave-ui": "file:ave-ui-0.0.2.tgz",
     "clone-buffer": "^1.0.0",
+    "node-hide-console-window": "^2.1.1",
     "pngjs": "^6.0.0"
   }
 }

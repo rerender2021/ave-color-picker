@@ -14,6 +14,10 @@ import * as path from "path";
 import * as fs from "fs";
 import { PNG } from "pngjs";
 import { getGrid, readPixel } from "./utils";
+import { hideConsole } from "node-hide-console-window";
+
+//To hide your console just call:
+hideConsole();
 
 class Program {
   app: App;

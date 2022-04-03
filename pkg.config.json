@@ -1,0 +1,10 @@
+{
+    "assets": [
+      "node_modules\\ave-ui\\lib\\Avernakis-Nodejs.node",
+      "build\\square.png"
+    ],
+    "targets": [
+      "node14-win-x64"
+    ],
+    "outputPath": "bin"
+  }
