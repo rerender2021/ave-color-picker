@@ -13,6 +13,7 @@ import {
   DpiMargin,
   DpiSize,
   Grid,
+  Vec2,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
@@ -63,18 +64,20 @@ class Program {
       picture.SetStretchMode(StretchMode.Center);
 
       const pager = new Pager(window);
-      const pictureGrid = new Grid(window);
-      // pictureGrid.ColAddDpx(100);
-      pictureGrid.ColAddSlice(1);
-      // pictureGrid.ColAddDpx(100);
+      pager.SetContent(picture);
+      pager.SetContentSize(new Vec2(png.width, png.height));
       
-      // pictureGrid.RowAddDpx(100);
-      pictureGrid.RowAddSlice(1);
-      // pictureGrid.RowAddDpx(100);
-      pictureGrid.SetBackColor(new Vec4(255, 0, 0, 128));
-      pictureGrid.ControlAdd(picture).SetGrid(0,0);
+      // const pictureGrid = new Grid(window);
+      // // pictureGrid.ColAddDpx(100);
+      // pictureGrid.ColAddSlice(1);
+      // // pictureGrid.ColAddDpx(100);
+      
+      // // pictureGrid.RowAddDpx(100);
+      // pictureGrid.RowAddSlice(1);
+      // // pictureGrid.RowAddDpx(100);
+      // pictureGrid.SetBackColor(new Vec4(255, 0, 0, 128));
+      // pictureGrid.ControlAdd(picture).SetGrid(0,0);
 
-      // pager.SetContent(pictureGrid);
 
       const colorView = new ColorView(window);
       picture.OnPointerMove((sender, mp) => {
@@ -94,7 +97,7 @@ class Program {
       //   DpiSize.FromPixelScaled(100), // margin right
       //   DpiSize.FromPixelScaled(100) // margin bottom
       // );
-      container.ControlAdd(pictureGrid).SetGrid(1, 1);
+      container.ControlAdd(pager).SetGrid(1, 1);
 
       const pixelGrid = new Grid(window);
       pixelGrid.ColAddSlice(1);
