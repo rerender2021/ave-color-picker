@@ -63,7 +63,18 @@ class Program {
       picture.SetStretchMode(StretchMode.Center);
 
       const pager = new Pager(window);
-      pager.SetContent(picture);
+      const pictureGrid = new Grid(window);
+      // pictureGrid.ColAddDpx(100);
+      pictureGrid.ColAddSlice(1);
+      // pictureGrid.ColAddDpx(100);
+      
+      // pictureGrid.RowAddDpx(100);
+      pictureGrid.RowAddSlice(1);
+      // pictureGrid.RowAddDpx(100);
+      pictureGrid.SetBackColor(new Vec4(255, 0, 0, 128));
+      pictureGrid.ControlAdd(picture).SetGrid(0,0);
+
+      // pager.SetContent(pictureGrid);
 
       const colorView = new ColorView(window);
       picture.OnPointerMove((sender, mp) => {
@@ -77,13 +88,13 @@ class Program {
 
       const container = getGrid(window, png.width, png.height);
 
-      const margin = new DpiMargin(
-        DpiSize.FromPixelScaled(100), // margin left
-        DpiSize.FromPixelScaled(100), // margin top
-        DpiSize.FromPixelScaled(100), // margin right
-        DpiSize.FromPixelScaled(100) // margin bottom
-      );
-      container.ControlAdd(pager).SetGrid(1, 1).SetMargin(margin);
+      // const margin = new DpiMargin(
+      //   DpiSize.FromPixelScaled(100), // margin left
+      //   DpiSize.FromPixelScaled(100), // margin top
+      //   DpiSize.FromPixelScaled(100), // margin right
+      //   DpiSize.FromPixelScaled(100) // margin bottom
+      // );
+      container.ControlAdd(pictureGrid).SetGrid(1, 1);
 
       const pixelGrid = new Grid(window);
       pixelGrid.ColAddSlice(1);
@@ -98,7 +109,7 @@ class Program {
       pixelGrid.ControlAdd(colorView).SetGrid(1, 1);
       pixelGrid.ControlAdd(colorText).SetGrid(1, 2);
 
-      container.ControlAdd(pixelGrid).SetGrid(3,0,1,3);
+      container.ControlAdd(pixelGrid).SetGrid(3, 0, 1, 3);
       window.SetContent(container);
       return true;
     });
@@ -109,3 +120,6 @@ globalThis.program = new Program();
 globalThis.program.run();
 
 // TODO: use page to wrap big picrue
+// lock color
+// more color format
+// drag to open
