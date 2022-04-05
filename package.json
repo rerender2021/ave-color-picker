@@ -23,7 +23,6 @@
   "dependencies": {
     "ave-ui": "file:ave-ui-0.0.2.tgz",
     "clone-buffer": "^1.0.0",
-    "node-hide-console-window": "^2.1.1",
     "pngjs": "^6.0.0"
   }
 }
