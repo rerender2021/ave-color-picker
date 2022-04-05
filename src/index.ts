@@ -72,7 +72,7 @@ class Program {
         console.log(pos, color);
 
         colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
-        colorText.SetText(`rgba:(${color.r},${color.g},${color.b},${color.a})`);
+        colorText.SetText(`rgba(${color.r},${color.g},${color.b},${color.a})`);
       });
 
       const container = getGrid(window, png.width, png.height);
