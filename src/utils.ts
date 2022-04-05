@@ -22,7 +22,7 @@ export function getGrid(window: Window, width = 500, height = 500) {
 
   container.RowAddSlice(1);
   container.RowAddDpx(height);
-  container.RowAddDpx(height);
+  container.RowAddDpx(50);
   container.RowAddSlice(1);
   return container;
 }

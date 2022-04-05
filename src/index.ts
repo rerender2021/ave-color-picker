@@ -5,10 +5,9 @@ import {
   WindowFlag,
   Picture,
   ResourceSource,
-  Label,
-  AlignType,
   ColorView,
   Vec4,
+  TextBox,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
@@ -49,8 +48,9 @@ class Program {
     const png = PNG.sync.read(pictureBuffer);
 
     this.window.OnCreateContent((window) => {
-      const label = new Label(window);
-      label.SetAlignHorz(AlignType.Center);
+      const colorText = new TextBox(window);
+      colorText.SetReadOnly(true);
+      colorText.SetBorder(false);
 
       const picture = new Picture(window);
       const source = ResourceSource.FromBuffer(pictureBuffer);
@@ -63,13 +63,13 @@ class Program {
         console.log(pos, color);
 
         colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
-        label.SetText(`rgba:(${color.r},${color.g},${color.b},${color.a})`);
+        colorText.SetText(`rgba:(${color.r},${color.g},${color.b},${color.a})`);
       });
 
       const container = getGrid(window, png.width, png.height);
       container.ControlAdd(picture).SetGrid(1, 1);
       container.ControlAdd(colorView).SetGrid(3, 1);
-      container.ControlAdd(label).SetGrid(3, 2);
+      container.ControlAdd(colorText).SetGrid(3, 2);
       window.SetContent(container);
       return true;
     });
@@ -80,4 +80,3 @@ globalThis.program = new Program();
 globalThis.program.run();
 
 // TODO: use page to wrap big picrue
-// use textbox and readonly=true to allow copy color
