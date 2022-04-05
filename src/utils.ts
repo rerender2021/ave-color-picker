@@ -15,13 +15,11 @@ export function readPixel(png: PNG, x: number, y: number) {
 export function getGrid(window: Window, width = 500, height = 500) {
   const container = new Grid(window);
   container.ColAddSlice(1);
-  container.ColAddDpx(width);
-  container.ColAddDpx(200);
-  container.ColAddDpx(width);
-  container.ColAddSlice(1);
+  container.ColAddDpx(100);
+  container.ColAddDpx(100);
 
   container.RowAddSlice(1);
-  container.RowAddDpx(height);
+  container.RowAddDpx(100);
   container.RowAddDpx(50);
   container.RowAddSlice(1);
   return container;

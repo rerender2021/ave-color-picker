@@ -8,6 +8,8 @@ import {
   ColorView,
   Vec4,
   TextBox,
+  Pager,
+  StretchMode,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
@@ -43,7 +45,7 @@ class Program {
   OnCreateContent() {
     //
     const pictureBuffer = fs.readFileSync(
-      path.resolve(__dirname, "./square.png")
+      path.resolve(__dirname, "./wallpaper.png")
     );
     const png = PNG.sync.read(pictureBuffer);
 
@@ -55,6 +57,10 @@ class Program {
       const picture = new Picture(window);
       const source = ResourceSource.FromBuffer(pictureBuffer);
       picture.SetPicture(source);
+      picture.SetStretchMode(StretchMode.Center);
+
+      const pager = new Pager(window);
+      pager.SetContent(picture);
 
       const colorView = new ColorView(window);
       picture.OnPointerMove((sender, mp) => {
@@ -67,9 +73,9 @@ class Program {
       });
 
       const container = getGrid(window, png.width, png.height);
-      container.ControlAdd(picture).SetGrid(1, 1);
-      container.ControlAdd(colorView).SetGrid(3, 1);
-      container.ControlAdd(colorText).SetGrid(3, 2);
+      container.ControlAdd(pager).SetGrid(0, 0, 1, 4);
+      container.ControlAdd(colorView).SetGrid(1, 1);
+      container.ControlAdd(colorText).SetGrid(1, 2);
       window.SetContent(container);
       return true;
     });
