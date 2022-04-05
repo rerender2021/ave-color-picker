@@ -59,21 +59,22 @@ class Program {
       picture.SetPicture(source);
       picture.SetStretchMode(StretchMode.Center);
 
-      const pager = new Pager(window);
-      pager.SetContent(picture);
-      pager.SetContentSize(new Vec2(png.width, png.height));
+      // Use another grid to make the picture displays at position(0, 0) in OnPointerMove
+      const pictureGrid = new Grid(window);
+      pictureGrid.ColAddSlice(1);
+      pictureGrid.ColAddPx(png.width);
+      pictureGrid.ColAddSlice(1);
       
-      // const pictureGrid = new Grid(window);
-      // // pictureGrid.ColAddDpx(100);
-      // pictureGrid.ColAddSlice(1);
-      // // pictureGrid.ColAddDpx(100);
-      
-      // // pictureGrid.RowAddDpx(100);
-      // pictureGrid.RowAddSlice(1);
-      // // pictureGrid.RowAddDpx(100);
-      // pictureGrid.SetBackColor(new Vec4(255, 0, 0, 128));
-      // pictureGrid.ControlAdd(picture).SetGrid(0,0);
+      pictureGrid.RowAddSlice(1);
+      pictureGrid.RowAddPx(png.height);
+      pictureGrid.RowAddSlice(1);
 
+      pictureGrid.SetBackColor(new Vec4(255, 0, 0, 128));
+      pictureGrid.ControlAdd(picture).SetGrid(1,1);
+
+      const pager = new Pager(window);
+      pager.SetContent(pictureGrid);
+      pager.SetContentSize(new Vec2(png.width, png.height));
 
       const colorView = new ColorView(window);
       picture.OnPointerMove((sender, mp) => {
@@ -83,6 +84,9 @@ class Program {
 
         colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
         colorText.SetText(`rgba(${color.r},${color.g},${color.b},${color.a})`);
+        
+        const contentSize = new Vec2(Math.max(pager.GetRect().w, png.width), Math.max(pager.GetRect().h, png.height));
+        pager.SetContentSize(contentSize);
       });
 
       const container = getGrid(window, png.width, png.height);
