@@ -10,6 +10,9 @@ import {
   TextBox,
   Pager,
   StretchMode,
+  DpiMargin,
+  DpiSize,
+  Grid,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
@@ -73,9 +76,29 @@ class Program {
       });
 
       const container = getGrid(window, png.width, png.height);
-      container.ControlAdd(pager).SetGrid(0, 0, 1, 4);
-      container.ControlAdd(colorView).SetGrid(1, 1);
-      container.ControlAdd(colorText).SetGrid(1, 2);
+
+      const margin = new DpiMargin(
+        DpiSize.FromPixelScaled(100), // margin left
+        DpiSize.FromPixelScaled(100), // margin top
+        DpiSize.FromPixelScaled(100), // margin right
+        DpiSize.FromPixelScaled(100) // margin bottom
+      );
+      container.ControlAdd(pager).SetGrid(1, 1).SetMargin(margin);
+
+      const pixelGrid = new Grid(window);
+      pixelGrid.ColAddSlice(1);
+      pixelGrid.ColAddDpx(125);
+      pixelGrid.ColAddSlice(1);
+
+      pixelGrid.RowAddSlice(1);
+      pixelGrid.RowAddDpx(125);
+      pixelGrid.RowAddDpx(50);
+      pixelGrid.RowAddSlice(1);
+
+      pixelGrid.ControlAdd(colorView).SetGrid(1, 1);
+      pixelGrid.ControlAdd(colorText).SetGrid(1, 2);
+
+      container.ControlAdd(pixelGrid).SetGrid(3,0,1,3);
       window.SetContent(container);
       return true;
     });
