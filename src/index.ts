@@ -12,16 +12,23 @@ import {
   Grid,
   Vec2,
   AlignType,
+  Button,
+  SysDialogFilter,
+  DragDropImage,
+  DropBehavior,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
-import { PNG } from "pngjs";
+import { PNG, PNGWithMetadata } from "pngjs";
 import { getGrid, readPixel } from "./utils";
 import { ResourceSource } from "ave-ui/build/Ave/Io/IoCommon";
 
 class Program {
   app: App;
   window: Window;
+  picture: Picture;
+  pager: Pager;
+  png: PNGWithMetadata;
 
   constructor() {
     this.app = new App();
@@ -41,57 +48,76 @@ class Program {
     this.window.Activate();
   }
 
+  openFile(file: string) {
+    const pictureBuffer = fs.readFileSync(file);
+    this.png = PNG.sync.read(pictureBuffer);
+    const source = ResourceSource.FromBuffer(pictureBuffer);
+    this.picture.SetPicture(source);
+    this.pager.SetContentSize(new Vec2(this.png.width, this.png.height));
+  }
+
   OnCreateContent() {
     //
-    const pictureBuffer = fs.readFileSync(
-      path.resolve(__dirname, "../assets/wallpaper.png")
-    );
-    const png = PNG.sync.read(pictureBuffer);
 
     this.window.OnCreateContent((window) => {
       const colorText = new TextBox(window);
       colorText.SetReadOnly(true);
       colorText.SetBorder(false);
 
-      const picture = new Picture(window);
-      const source = ResourceSource.FromBuffer(pictureBuffer);
-      picture.SetPicture(source);
-      picture.SetStretchMode(StretchMode.Center);
+      this.picture = new Picture(window);
+      this.picture.SetStretchMode(StretchMode.Center);
 
-      const pager = new Pager(window);
-      pager.SetContent(picture);
-      pager.SetContentHorizontalAlign(AlignType.Center);
-      pager.SetContentVerticalAlign(AlignType.Center);
-      pager.SetContentSize(new Vec2(png.width, png.height));
+      this.pager = new Pager(window);
+      this.pager.SetContent(this.picture);
+      this.pager.SetContentHorizontalAlign(AlignType.Center);
+      this.pager.SetContentVerticalAlign(AlignType.Center);
 
       const colorView = new ColorView(window);
-      picture.OnPointerMove((sender, mp) => {
+      this.picture.OnPointerMove((sender, mp) => {
         const pos = mp.Position;
-        const color = readPixel(png, pos.x, pos.y);
+        const color = readPixel(this.png, pos.x, pos.y);
         console.log(pos, color);
 
         colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
         colorText.SetText(`rgba(${color.r},${color.g},${color.b},${color.a})`);
       });
 
-      const container = getGrid(window, png.width, png.height);
-      container.ControlAdd(pager).SetGrid(1, 1);
+      const container = new Grid(window);
+      container.RowAddSlice(1);
+      container.ColAddSlice(1);
+      container.ColAddDpx(128);
+
+      container.ControlAdd(this.pager).SetGrid(0, 0);
+
+      const btnOpen = new Button(window);
+      btnOpen.SetText("Open File");
+      btnOpen.OnClick(() => {
+        const s = window.GetCommonUi().OpenFile([new SysDialogFilter("PNG Files", "*.png")], "png", "", "");
+        if (s.length > 0)
+          this.openFile(s);
+      });
 
       const pixelGrid = new Grid(window);
       pixelGrid.ColAddSlice(1);
-      pixelGrid.ColAddDpx(125);
-      pixelGrid.ColAddSlice(1);
+      pixelGrid.RowAddDpx(128, 24, 32);
 
-      pixelGrid.RowAddSlice(1);
-      pixelGrid.RowAddDpx(125);
-      pixelGrid.RowAddDpx(50);
-      pixelGrid.RowAddSlice(1);
+      pixelGrid.ControlAdd(colorView).SetGrid(0, 0);
+      pixelGrid.ControlAdd(colorText).SetGrid(0, 1);
+      pixelGrid.ControlAdd(btnOpen).SetGrid(0, 2);
 
-      pixelGrid.ControlAdd(colorView).SetGrid(1, 1);
-      pixelGrid.ControlAdd(colorText).SetGrid(1, 2);
-
-      container.ControlAdd(pixelGrid).SetGrid(3, 0, 1, 3);
+      container.ControlAdd(pixelGrid).SetGrid(1, 0);
       window.SetContent(container);
+
+      window.OnDragMove((sender, dc) => {
+        if (1 == dc.FileGetCount() && dc.FileGet()[0].toLowerCase().endsWith(".png")) {
+          dc.SetDropTip(DragDropImage.Copy, "Open this file");
+          dc.SetDropBehavior(DropBehavior.Copy);
+        }
+      });
+      window.OnDragDrop((sender, dc) => {
+        this.openFile(dc.FileGet()[0]);
+      });
+      this.openFile(path.resolve(__dirname, "../assets/wallpaper.png"));
       return true;
     });
   }
