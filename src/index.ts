@@ -4,21 +4,20 @@ import {
   Window,
   WindowFlag,
   Picture,
-  ResourceSource,
   ColorView,
   Vec4,
   TextBox,
   Pager,
   StretchMode,
-  DpiMargin,
-  DpiSize,
   Grid,
   Vec2,
+  AlignType,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
 import { PNG } from "pngjs";
 import { getGrid, readPixel } from "./utils";
+import { ResourceSource } from "ave-ui/build/Ave/Io/IoCommon";
 
 class Program {
   app: App;
@@ -59,21 +58,10 @@ class Program {
       picture.SetPicture(source);
       picture.SetStretchMode(StretchMode.Center);
 
-      // Use another grid to make the picture displays at position(0, 0) in OnPointerMove
-      const pictureGrid = new Grid(window);
-      pictureGrid.ColAddSlice(1);
-      pictureGrid.ColAddPx(png.width);
-      pictureGrid.ColAddSlice(1);
-      
-      pictureGrid.RowAddSlice(1);
-      pictureGrid.RowAddPx(png.height);
-      pictureGrid.RowAddSlice(1);
-
-      pictureGrid.SetBackColor(new Vec4(255, 0, 0, 128));
-      pictureGrid.ControlAdd(picture).SetGrid(1,1);
-
       const pager = new Pager(window);
-      pager.SetContent(pictureGrid);
+      pager.SetContent(picture);
+      pager.SetContentHorizontalAlign(AlignType.Center);
+      pager.SetContentVerticalAlign(AlignType.Center);
       pager.SetContentSize(new Vec2(png.width, png.height));
 
       const colorView = new ColorView(window);
@@ -84,19 +72,9 @@ class Program {
 
         colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
         colorText.SetText(`rgba(${color.r},${color.g},${color.b},${color.a})`);
-        
-        const contentSize = new Vec2(Math.max(pager.GetRect().w, png.width), Math.max(pager.GetRect().h, png.height));
-        pager.SetContentSize(contentSize);
       });
 
       const container = getGrid(window, png.width, png.height);
-
-      // const margin = new DpiMargin(
-      //   DpiSize.FromPixelScaled(100), // margin left
-      //   DpiSize.FromPixelScaled(100), // margin top
-      //   DpiSize.FromPixelScaled(100), // margin right
-      //   DpiSize.FromPixelScaled(100) // margin bottom
-      // );
       container.ControlAdd(pager).SetGrid(1, 1);
 
       const pixelGrid = new Grid(window);

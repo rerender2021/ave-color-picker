@@ -21,7 +21,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "ave-ui": "file:ave-ui-0.0.2.tgz",
+    "ave-ui": "^0.1.0",
     "clone-buffer": "^1.0.0",
     "pngjs": "^6.0.0"
   }
