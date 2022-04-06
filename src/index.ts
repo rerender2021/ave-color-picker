@@ -44,7 +44,7 @@ class Program {
   OnCreateContent() {
     //
     const pictureBuffer = fs.readFileSync(
-      path.resolve(__dirname, "./wallpaper.png")
+      path.resolve(__dirname, "../assets/wallpaper.png")
     );
     const png = PNG.sync.read(pictureBuffer);
 
