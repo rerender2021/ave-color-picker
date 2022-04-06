@@ -7,22 +7,20 @@
   "scripts": {
     "dev": "tsnd --respawn ./src/index.ts",
     "build": "tsc",
-    "release": "npm run build && pkg --output ./bin/color-picker.exe --config pkg.config.json ./build/index.js "
+    "prerelease": "npm run build",
+    "release": "ave-pack pack"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.21",
     "@types/pngjs": "^6.0.1",
-    "pe-library": "^0.2.1",
-    "pkg": "^5.5.2",
-    "resedit": "^1.5.0",
+    "ave-pack": "^0.9.1",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.6.2"
   },
   "dependencies": {
     "ave-ui": "^0.1.0",
-    "clone-buffer": "^1.0.0",
     "pngjs": "^6.0.0"
   }
 }
