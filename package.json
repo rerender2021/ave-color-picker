@@ -2,12 +2,11 @@
   "name": "ave-color-picker",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
-  "bin": "build/index.js",
   "scripts": {
     "dev": "tsnd --respawn ./src/index.ts",
     "prebuild": "del-cli ./build",
     "build": "tsc",
+    "postbuild": "copyfiles ./assets/* ./build",
     "prerelease": "npm run build",
     "release": "ave-pack pack"
   },
@@ -16,7 +15,7 @@
   "devDependencies": {
     "@types/node": "^17.0.21",
     "@types/pngjs": "^6.0.1",
-    "ave-pack": "^0.9.1",
+    "ave-pack": "file:ave-pack-0.9.1.tgz",
     "copyfiles": "^2.4.1",
     "del-cli": "^4.0.1",
     "ts-node-dev": "^1.1.8",
