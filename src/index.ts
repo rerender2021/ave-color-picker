@@ -28,13 +28,15 @@ import {
   Label,
   DpiMargin,
   DpiSize,
+  DrawImageFilter,
+  DrawImageFlag,
+  DrawImageParam,
+  ResourceSource,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
 import { PNG, PNGWithMetadata } from "pngjs";
 import { readPixel } from "./utils";
-import { ResourceSource } from "ave-ui/build/Ave/Io/IoCommon";
-import { DrawImageFilter, DrawImageFlag, DrawImageParam } from "ave-ui/build/Ave/Ui/UiPainter";
 
 class Program {
   app: App;
@@ -75,13 +77,22 @@ class Program {
   }
 
   browseOpenFile() {
-    const s = this.window.GetCommonUi().OpenFile([new SysDialogFilter("PNG Files", "*.png")], "png", "", "");
-    if (null != s && s.length > 0)
-      this.openFile(s);
+    const s = this.window
+      .GetCommonUi()
+      .OpenFile([new SysDialogFilter("PNG Files", "*.png")], "png", "", "");
+    if (null != s && s.length > 0) this.openFile(s);
   }
 
   pastePicture() {
-    this.window.GetCommonUi().Message("TODO: Paste picture from clipboard.", "", MessageIcon.None, MessageButton.Ok, "color-picker");
+    this.window
+      .GetCommonUi()
+      .Message(
+        "TODO: Paste picture from clipboard.",
+        "",
+        MessageIcon.None,
+        MessageButton.Ok,
+        "color-picker"
+      );
   }
 
   OnCreateContent() {
@@ -99,7 +110,12 @@ class Program {
         rcImage.UniformScale(rcContainer);
         dip.TargetSize.x = rcImage.w;
         dip.TargetSize.y = rcImage.h;
-        painter.DrawImageEx(this.image, rcImage.Position, DrawImageFlag.TargetSize, dip);
+        painter.DrawImageEx(
+          this.image,
+          rcImage.Position,
+          DrawImageFlag.TargetSize,
+          dip
+        );
         painter.SetPenColor(new Vec4(0, 0, 0, 255));
         const vw = this.pager.GetRect().w;
         const vh = this.pager.GetRect().h;
@@ -129,7 +145,12 @@ class Program {
       const zoomView = new Placeholder(window);
       zoomView.OnPaintPost((sender, painter, rc) => {
         const blockSize = rc.w / 9;
-        if (vPixelPos.x >= 0 && vPixelPos.y >= 0 && vPixelPos.x < this.png.width && vPixelPos.y < this.png.height) {
+        if (
+          vPixelPos.x >= 0 &&
+          vPixelPos.y >= 0 &&
+          vPixelPos.x < this.png.width &&
+          vPixelPos.y < this.png.height
+        ) {
           const v = Vec2.Zero;
           dip.SourceRect.x = vPixelPos.x - 4;
           dip.SourceRect.y = vPixelPos.y - 4;
@@ -151,13 +172,30 @@ class Program {
             dip.SourceRect.h = this.png.height - dip.SourceRect.y;
           dip.TargetSize.x = dip.SourceRect.w * blockSize;
           dip.TargetSize.y = dip.SourceRect.h * blockSize;
-          painter.DrawImageEx(this.image, v, DrawImageFlag.TargetSize | DrawImageFlag.SourceRect | DrawImageFlag.Filter, dip);
+          painter.DrawImageEx(
+            this.image,
+            v,
+            DrawImageFlag.TargetSize |
+              DrawImageFlag.SourceRect |
+              DrawImageFlag.Filter,
+            dip
+          );
         }
         painter.SetPenColor(new Vec4(0, 0, 0, 255));
         painter.DrawRectangle(rc.x, rc.y, rc.w, rc.h);
-        painter.DrawRectangle((rc.w - blockSize) * 0.5, (rc.h - blockSize) * 0.5, blockSize, blockSize);
+        painter.DrawRectangle(
+          (rc.w - blockSize) * 0.5,
+          (rc.h - blockSize) * 0.5,
+          blockSize,
+          blockSize
+        );
         painter.SetPenColor(new Vec4(255, 255, 255, 255));
-        painter.DrawRectangle((rc.w - blockSize) * 0.5 - 1, (rc.h - blockSize) * 0.5 - 1, blockSize + 2, blockSize + 2);
+        painter.DrawRectangle(
+          (rc.w - blockSize) * 0.5 - 1,
+          (rc.h - blockSize) * 0.5 - 1,
+          blockSize + 2,
+          blockSize + 2
+        );
       });
 
       const colorView = new ColorView(window);
@@ -186,12 +224,10 @@ class Program {
         bLock = false;
       });
       this.picture.OnPointerPress((sender, mp) => {
-        if (mp.Button == PointerButton.First)
-          bLock = !bLock;
+        if (mp.Button == PointerButton.First) bLock = !bLock;
       });
       this.picture.OnPointerMove((sender, mp) => {
-        if (!bLock)
-          onPointerMove(mp.Position);
+        if (!bLock) onPointerMove(mp.Position);
       });
 
       const container = new Grid(window);
@@ -220,16 +256,27 @@ class Program {
       pixelGrid.RowAddSlice(1);
       pixelGrid.RowAddDpx(16, 4, 16, 4, 16, 4, 16);
 
-      const marginLeft = new DpiMargin(DpiSize.FromPixelScaled(4), DpiSize.Zero, DpiSize.Zero, DpiSize.Zero);
+      const marginLeft = new DpiMargin(
+        DpiSize.FromPixelScaled(4),
+        DpiSize.Zero,
+        DpiSize.Zero,
+        DpiSize.Zero
+      );
 
       let row = -2;
-      pixelGrid.ControlAdd(miniView).SetGrid(0, row += 2);
-      pixelGrid.ControlAdd(zoomView).SetGrid(0, row += 2);
-      pixelGrid.ControlAdd(colorView).SetGrid(0, row += 2);
-      pixelGrid.ControlAdd(txtPixelPos).SetGrid(0, row += 2).SetMargin(marginLeft);
-      pixelGrid.ControlAdd(txtRgba).SetGrid(0, row += 2).SetMargin(marginLeft);
-      pixelGrid.ControlAdd(btnOpen).SetGrid(0, row += 2);
-      pixelGrid.ControlAdd(btnPaste).SetGrid(0, row += 2);
+      pixelGrid.ControlAdd(miniView).SetGrid(0, (row += 2));
+      pixelGrid.ControlAdd(zoomView).SetGrid(0, (row += 2));
+      pixelGrid.ControlAdd(colorView).SetGrid(0, (row += 2));
+      pixelGrid
+        .ControlAdd(txtPixelPos)
+        .SetGrid(0, (row += 2))
+        .SetMargin(marginLeft);
+      pixelGrid
+        .ControlAdd(txtRgba)
+        .SetGrid(0, (row += 2))
+        .SetMargin(marginLeft);
+      pixelGrid.ControlAdd(btnOpen).SetGrid(0, (row += 2));
+      pixelGrid.ControlAdd(btnPaste).SetGrid(0, (row += 2));
 
       const createLabel = (s: string) => {
         const lbl = new Label(window);
@@ -238,11 +285,28 @@ class Program {
         return lbl;
       };
 
-      const marginRight = new DpiMargin(DpiSize.Zero, DpiSize.Zero, DpiSize.FromPixelScaled(4), DpiSize.Zero);
-      pixelGrid.ControlAdd(createLabel("WSAD: Move by pixel")).SetGrid(0, row += 2).SetMargin(marginRight);
-      pixelGrid.ControlAdd(createLabel("F: Open File")).SetGrid(0, row += 2).SetMargin(marginRight);
-      pixelGrid.ControlAdd(createLabel("V: Paste")).SetGrid(0, row += 2).SetMargin(marginRight);
-      pixelGrid.ControlAdd(createLabel("Drop a png to open")).SetGrid(0, row += 2).SetMargin(marginRight);
+      const marginRight = new DpiMargin(
+        DpiSize.Zero,
+        DpiSize.Zero,
+        DpiSize.FromPixelScaled(4),
+        DpiSize.Zero
+      );
+      pixelGrid
+        .ControlAdd(createLabel("WSAD: Move by pixel"))
+        .SetGrid(0, (row += 2))
+        .SetMargin(marginRight);
+      pixelGrid
+        .ControlAdd(createLabel("F: Open File"))
+        .SetGrid(0, (row += 2))
+        .SetMargin(marginRight);
+      pixelGrid
+        .ControlAdd(createLabel("V: Paste"))
+        .SetGrid(0, (row += 2))
+        .SetMargin(marginRight);
+      pixelGrid
+        .ControlAdd(createLabel("Drop a png to open"))
+        .SetGrid(0, (row += 2))
+        .SetMargin(marginRight);
 
       container.ControlAdd(pixelGrid).SetGrid(1, 0);
       window.SetContent(container);
@@ -262,18 +326,37 @@ class Program {
       window.OnWindowHotkey((sender, nId, key, n) => {
         const v = window.GetPlatform().PointerGetPosition();
         switch (nId) {
-          case hkW: --v.y; moveCursor(v); break;
-          case hkS: ++v.y; moveCursor(v); break;
-          case hkA: --v.x; moveCursor(v); break;
-          case hkD: ++v.x; moveCursor(v); break;
-          case hkOpen: this.browseOpenFile(); break;
-          case hkPaste: this.pastePicture(); break;
+          case hkW:
+            --v.y;
+            moveCursor(v);
+            break;
+          case hkS:
+            ++v.y;
+            moveCursor(v);
+            break;
+          case hkA:
+            --v.x;
+            moveCursor(v);
+            break;
+          case hkD:
+            ++v.x;
+            moveCursor(v);
+            break;
+          case hkOpen:
+            this.browseOpenFile();
+            break;
+          case hkPaste:
+            this.pastePicture();
+            break;
         }
       });
 
       // Drag & drop support
       window.OnDragMove((sender, dc) => {
-        if (1 == dc.FileGetCount() && dc.FileGet()[0].toLowerCase().endsWith(".png")) {
+        if (
+          1 == dc.FileGetCount() &&
+          dc.FileGet()[0].toLowerCase().endsWith(".png")
+        ) {
           dc.SetDropTip(DragDropImage.Copy, "Open this file");
           dc.SetDropBehavior(DropBehavior.Copy);
         }
