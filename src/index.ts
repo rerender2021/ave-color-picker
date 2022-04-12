@@ -76,8 +76,8 @@ class Program {
     this.pager.SetContentSize(new Vec2(this.png.width, this.png.height));
   }
 
-  browseOpenFile() {
-    const s = this.window
+  async browseOpenFile() {
+    const s = await this.window
       .GetCommonUi()
       .OpenFile([new SysDialogFilter("PNG Files", "*.png")], "png", "", "");
     if (null != s && s.length > 0) this.openFile(s);
@@ -373,8 +373,3 @@ class Program {
 
 globalThis.program = new Program();
 globalThis.program.run();
-
-// TODO: use page to wrap big picrue
-// lock color
-// more color format
-// drag to open
