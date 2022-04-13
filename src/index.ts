@@ -32,6 +32,8 @@ import {
   DrawImageFlag,
   DrawImageParam,
   ResourceSource,
+  InputModifier,
+  CultureId,
 } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
@@ -48,6 +50,16 @@ class Program {
 
   constructor() {
     this.app = new App();
+    this.app.LangSetDefaultString(CultureId.en_us, {
+      "CoOk"      /**/: "OK",
+      "CoCut"    	/**/: "Cut",
+      "CoCopy"   	/**/: "Copy",
+      "CoPaste"  	/**/: "Paste",
+      "CoDelete" 	/**/: "Delete",
+      "CoUndo"   	/**/: "Undo",
+      "CoSelAll" 	/**/: "Select All",
+    });
+    this.app.LangSetCurrent(CultureId.en_us);
 
     const cpWindow = new WindowCreation();
     cpWindow.Title = "Color Picker";
@@ -117,17 +129,18 @@ class Program {
           dip
         );
         painter.SetPenColor(new Vec4(0, 0, 0, 255));
-        const vw = this.pager.GetRect().w;
-        const vh = this.pager.GetRect().h;
-        if (this.png.width > vw || this.png.height > vh) {
+        const sm = this.pager.GetScrollMax();
+        const sp = this.pager.GetScrollPosition();
+        const rcp = this.pager.GetRectClient();
+        if (sm.x > 0 || sm.y > 0) {
           const rcv = new Rect(0, 0, 1, 1);
-          if (this.png.width > vw) {
-            rcv.x = -this.picture.GetRect().x / this.png.width;
-            rcv.w = vw / this.png.width;
+          if (sm.x > 0) {
+            rcv.x = -sp.x / sm.x;
+            rcv.w = rcp.w / sm.x;
           }
-          if (this.png.height > vh) {
-            rcv.y = -this.picture.GetRect().y / this.png.height;
-            rcv.h = vh / this.png.height;
+          if (sm.y > 0) {
+            rcv.y = -sp.y / sm.y;
+            rcv.h = rcp.h / sm.y;
           }
           rcv.x = rcv.x * rcImage.w + rcImage.x;
           rcv.w *= rcImage.w;
@@ -139,6 +152,29 @@ class Program {
           painter.DrawRectangle(rcv.x, rcv.y, rcv.w, rcv.h);
         }
         painter.DrawRectangle(rc.x, rc.y, rc.w, rc.h);
+      });
+      const moveMiniView = (v: Vec2) => {
+        const sm = this.pager.GetScrollMax();
+        const rc = miniView.GetRectClient();
+        const rcp = this.pager.GetRectClient();
+        if (sm.x > 0 || sm.y > 0) {
+          const rcImage = new Rect(0, 0, this.png.width, this.png.height);
+          rcImage.UniformScale(rc);
+          const vPos = Vec2.Zero;
+          if (this.png.width > rc.w)
+            vPos.x = -Math.max(0, (v.x - rcImage.x) / rcImage.w * sm.x - rcp.w * 0.5);
+          if (this.png.height > rc.h)
+            vPos.y = -Math.max(0, (v.y - rcImage.y) / rcImage.h * sm.y - rcp.h * 0.5);
+          this.pager.SetScrollPosition(vPos, false);
+        }
+      };
+      miniView.OnPointerPress((sender, mp) => {
+        if (PointerButton.First == mp.Button)
+          moveMiniView(mp.Position);
+      });
+      miniView.OnPointerMove((sender, mp) => {
+        if (InputModifier.Button1 & mp.Modifier)
+          moveMiniView(mp.Position);
       });
 
       let vPixelPos = new Vec2(-1, -1);
@@ -224,10 +260,13 @@ class Program {
         bLock = false;
       });
       this.picture.OnPointerPress((sender, mp) => {
-        if (mp.Button == PointerButton.First) bLock = !bLock;
+        if (mp.Button == PointerButton.First) {
+          bLock = !bLock;
+        }
       });
       this.picture.OnPointerMove((sender, mp) => {
-        if (!bLock) onPointerMove(mp.Position);
+        if (!bLock)
+         onPointerMove(mp.Position);
       });
 
       const container = new Grid(window);
@@ -254,7 +293,7 @@ class Program {
       pixelGrid.ColAddSlice(1);
       pixelGrid.RowAddDpx(128, 4, 128, 4, 32, 4, 16, 4, 16, 4, 32, 4, 32);
       pixelGrid.RowAddSlice(1);
-      pixelGrid.RowAddDpx(16, 4, 16, 4, 16, 4, 16);
+      pixelGrid.RowAddDpx(16, 4, 16, 4, 16, 4, 16, 4, 16);
 
       const marginLeft = new DpiMargin(
         DpiSize.FromPixelScaled(4),
@@ -281,32 +320,30 @@ class Program {
       const createLabel = (s: string) => {
         const lbl = new Label(window);
         lbl.SetText(s);
-        lbl.SetAlignHorz(AlignType.Far);
+        //lbl.SetAlignHorz(AlignType.Far);
         return lbl;
       };
 
-      const marginRight = new DpiMargin(
-        DpiSize.Zero,
-        DpiSize.Zero,
-        DpiSize.FromPixelScaled(4),
-        DpiSize.Zero
-      );
       pixelGrid
         .ControlAdd(createLabel("WSAD: Move by pixel"))
         .SetGrid(0, (row += 2))
-        .SetMargin(marginRight);
+        .SetMargin(marginLeft);
+      pixelGrid
+        .ControlAdd(createLabel("Space/Click: Lock result"))
+        .SetGrid(0, (row += 2))
+        .SetMargin(marginLeft);
       pixelGrid
         .ControlAdd(createLabel("F: Open File"))
         .SetGrid(0, (row += 2))
-        .SetMargin(marginRight);
+        .SetMargin(marginLeft);
       pixelGrid
         .ControlAdd(createLabel("V: Paste"))
         .SetGrid(0, (row += 2))
-        .SetMargin(marginRight);
+        .SetMargin(marginLeft);
       pixelGrid
         .ControlAdd(createLabel("Drop a png to open"))
         .SetGrid(0, (row += 2))
-        .SetMargin(marginRight);
+        .SetMargin(marginLeft);
 
       container.ControlAdd(pixelGrid).SetGrid(1, 0);
       window.SetContent(container);
@@ -321,6 +358,7 @@ class Program {
       const hkS = window.HotkeyRegister(KbKey.S, 0);
       const hkA = window.HotkeyRegister(KbKey.A, 0);
       const hkD = window.HotkeyRegister(KbKey.D, 0);
+      const hkSpace = window.HotkeyRegister(KbKey.Space, 0);
       const hkOpen = window.HotkeyRegister(KbKey.F, 0);
       const hkPaste = window.HotkeyRegister(KbKey.V, 0);
       window.OnWindowHotkey((sender, nId, key, n) => {
@@ -341,6 +379,9 @@ class Program {
           case hkD:
             ++v.x;
             moveCursor(v);
+            break;
+          case hkSpace:
+            bLock = !bLock;
             break;
           case hkOpen:
             this.browseOpenFile();
