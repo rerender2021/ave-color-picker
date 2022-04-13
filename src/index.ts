@@ -59,7 +59,6 @@ class Program {
       "CoUndo"   	/**/: "Undo",
       "CoSelAll" 	/**/: "Select All",
     });
-    this.app.LangSetCurrent(CultureId.en_us);
 
     const cpWindow = new WindowCreation();
     cpWindow.Title = "Color Picker";
