@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { PNG, PNGWithMetadata } from "pngjs";
 import { readPixel } from "./utils";
+import { MiniView } from "./mini-view";
 
 export class Program {
 	app: App;
@@ -11,19 +12,20 @@ export class Program {
 	picture: Picture;
 	pager: Pager;
 	png: PNGWithMetadata;
+	miniView: MiniView;
 
 	constructor() {
 		this.app = new App();
 		// prettier-ignore
 		this.app.LangSetDefaultString(CultureId.en_us, {
-      "CoOk"      /**/: "OK",
-      "CoCut"    	/**/: "Cut",
-      "CoCopy"   	/**/: "Copy",
-      "CoPaste"  	/**/: "Paste",
-      "CoDelete" 	/**/: "Delete",
-      "CoUndo"   	/**/: "Undo",
-      "CoSelAll" 	/**/: "Select All",
-    });
+			"CoOk"      /**/: "OK",
+			"CoCut"    	/**/: "Cut",
+			"CoCopy"   	/**/: "Copy",
+			"CoPaste"  	/**/: "Paste",
+			"CoDelete" 	/**/: "Delete",
+			"CoUndo"   	/**/: "Undo",
+			"CoSelAll" 	/**/: "Select All",
+		});
 
 		const cpWindow = new WindowCreation();
 		cpWindow.Title = "Color Picker";
@@ -48,6 +50,7 @@ export class Program {
 		imgcp.DataType = Byo2ImageDataType.Coded;
 		imgcp.Data = source;
 		this.image = new Byo2Image(this.window, imgcp);
+		this.miniView.track({ pager: this.pager, image: this.image });
 		this.picture.SetImage(this.image);
 		this.pager.SetContentSize(new Vec2(this.png.width, this.png.height));
 	}
@@ -69,58 +72,7 @@ export class Program {
 			const dip = new DrawImageParam();
 			dip.Filter = DrawImageFilter.Point;
 
-			const miniView = new Placeholder(window);
-			miniView.OnPaintPost((sender, painter, rc) => {
-				const rcImage = new Rect(0, 0, this.png.width, this.png.height);
-				const rcContainer = new Rect(rc.x, rc.y, rc.w, rc.h);
-				rcImage.UniformScale(rcContainer);
-				dip.TargetSize.x = rcImage.w;
-				dip.TargetSize.y = rcImage.h;
-				painter.DrawImageEx(this.image, rcImage.Position, DrawImageFlag.TargetSize, dip);
-				painter.SetPenColor(new Vec4(0, 0, 0, 255));
-				const sm = this.pager.GetScrollMax();
-				const sp = this.pager.GetScrollPosition();
-				const rcp = this.pager.GetRectClient();
-				if (sm.x > 0 || sm.y > 0) {
-					const rcv = new Rect(0, 0, 1, 1);
-					if (sm.x > 0) {
-						rcv.x = -sp.x / sm.x;
-						rcv.w = rcp.w / sm.x;
-					}
-					if (sm.y > 0) {
-						rcv.y = -sp.y / sm.y;
-						rcv.h = rcp.h / sm.y;
-					}
-					rcv.x = rcv.x * rcImage.w + rcImage.x;
-					rcv.w *= rcImage.w;
-					rcv.y = rcv.y * rcImage.h + rcImage.y;
-					rcv.h *= rcImage.h;
-					painter.SetPenColor(new Vec4(255, 255, 255, 255));
-					painter.DrawRectangle(rcv.x - 1, rcv.y - 1, rcv.w + 2, rcv.h + 2);
-					painter.SetPenColor(new Vec4(0, 0, 0, 255));
-					painter.DrawRectangle(rcv.x, rcv.y, rcv.w, rcv.h);
-				}
-				painter.DrawRectangle(rc.x, rc.y, rc.w, rc.h);
-			});
-			const moveMiniView = (v: Vec2) => {
-				const sm = this.pager.GetScrollMax();
-				const rc = miniView.GetRectClient();
-				const rcp = this.pager.GetRectClient();
-				if (sm.x > 0 || sm.y > 0) {
-					const rcImage = new Rect(0, 0, this.png.width, this.png.height);
-					rcImage.UniformScale(rc);
-					const vPos = Vec2.Zero;
-					if (this.png.width > rc.w) vPos.x = -Math.max(0, ((v.x - rcImage.x) / rcImage.w) * sm.x - rcp.w * 0.5);
-					if (this.png.height > rc.h) vPos.y = -Math.max(0, ((v.y - rcImage.y) / rcImage.h) * sm.y - rcp.h * 0.5);
-					this.pager.SetScrollPosition(vPos, false);
-				}
-			};
-			miniView.OnPointerPress((sender, mp) => {
-				if (PointerButton.First == mp.Button) moveMiniView(mp.Position);
-			});
-			miniView.OnPointerMove((sender, mp) => {
-				if (InputModifier.Button1 & mp.Modifier) moveMiniView(mp.Position);
-			});
+			this.miniView = new MiniView(window);
 
 			let vPixelPos = new Vec2(-1, -1);
 			const zoomView = new Placeholder(window);
@@ -218,7 +170,7 @@ export class Program {
 			const marginLeft = new DpiMargin(DpiSize.FromPixelScaled(4), DpiSize.Zero, DpiSize.Zero, DpiSize.Zero);
 
 			let row = -2;
-			pixelGrid.ControlAdd(miniView).SetGrid(0, (row += 2));
+			pixelGrid.ControlAdd(this.miniView.control).SetGrid(0, (row += 2));
 			pixelGrid.ControlAdd(zoomView).SetGrid(0, (row += 2));
 			pixelGrid.ControlAdd(colorView).SetGrid(0, (row += 2));
 			pixelGrid
@@ -318,7 +270,7 @@ export class Program {
 				this.openFile(dc.FileGet()[0]);
 			});
 
-			this.openFile(path.resolve(__dirname, "../assets/wallpaper.png"));
+			this.openFile(path.resolve(__dirname, "../assets/wallpaper-full.png"));
 			return true;
 		});
 	}
