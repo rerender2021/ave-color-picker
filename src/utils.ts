@@ -1,4 +1,3 @@
-import { Grid, Window } from "ave-ui";
 import { PNG } from "pngjs";
 
 export function readPixel(png: PNG, x: number, y: number) {
@@ -10,17 +9,4 @@ export function readPixel(png: PNG, x: number, y: number) {
     b: data[i + 2],
     a: data[i + 3],
   };
-}
-
-export function getGrid(window: Window, width = 500, height = 500) {
-  const container = new Grid(window);
-  container.ColAddDpx(100);
-  container.ColAddSlice(1);
-  container.ColAddDpx(100);
-  container.ColAddDpx(300);
-
-  container.RowAddDpx(100);
-  container.RowAddSlice(1);
-  container.RowAddDpx(100);
-  return container;
 }
