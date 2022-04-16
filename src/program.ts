@@ -1,18 +1,16 @@
 import { App, WindowCreation, Window, WindowFlag, Picture, ColorView, Vec4, TextBox, Pager, StretchMode, Grid, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, Byo2Image, Byo2ImageCreation, Byo2ImageDataType, Placeholder, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, DrawImageFilter, DrawImageFlag, DrawImageParam, ResourceSource, InputModifier, CultureId } from "ave-ui";
 import * as path from "path";
 import * as fs from "fs";
-import { PNG, PNGWithMetadata } from "pngjs";
-import { readPixel } from "./utils";
 import { MiniView } from "./mini-view";
 import { ZoomView } from "./zoom-view";
+import { NativeImage } from "./native-image";
 
 export class Program {
 	app: App;
 	window: Window;
-	image: Byo2Image;
+	image: NativeImage;
 	picture: Picture;
 	pager: Pager;
-	png: PNGWithMetadata;
 	miniView: MiniView;
 	zoomView: ZoomView;
 
@@ -45,18 +43,14 @@ export class Program {
 	}
 
 	openFile(file: string) {
-		const pictureBuffer = fs.readFileSync(file);
-		this.png = PNG.sync.read(pictureBuffer);
-		const source = ResourceSource.FromBuffer(pictureBuffer);
-		const imgcp = new Byo2ImageCreation();
-		imgcp.DataType = Byo2ImageDataType.Coded;
-		imgcp.Data = source;
+		const buffer = fs.readFileSync(file);
+		this.image = new NativeImage(this.window, buffer);
 
-		this.image = new Byo2Image(this.window, imgcp);
-		this.zoomView.track({ image: this.image });
-		this.miniView.track({ pager: this.pager, image: this.image });
-		this.picture.SetImage(this.image);
-		this.pager.SetContentSize(new Vec2(this.png.width, this.png.height));
+		const nativeImage = this.image.native;
+		this.zoomView.track({ image: nativeImage });
+		this.miniView.track({ pager: this.pager, image: nativeImage });
+		this.picture.SetImage(nativeImage);
+		this.pager.SetContentSize(new Vec2(nativeImage.GetWidth(), nativeImage.GetHeight()));
 	}
 
 	async browseOpenFile() {
@@ -93,7 +87,7 @@ export class Program {
 
 			const onPointerMove = (pos: Vec2) => {
 				this.zoomView.updatePixelPos(pos);
-				const color = readPixel(this.png, pos.x, pos.y);
+				const color = this.image.readPixel(pos.x, pos.y);
 				console.log(pos, color);
 
 				colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));

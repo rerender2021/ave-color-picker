@@ -13,7 +13,6 @@ export class MiniView extends Component {
 
 	constructor(window: Window) {
 		super(window);
-		this.view = new Placeholder(this.window);
 		this.onCreate();
 	}
 
@@ -28,6 +27,8 @@ export class MiniView extends Component {
 	}
 
 	private onCreate() {
+		this.view = new Placeholder(this.window);
+
 		const dip = new DrawImageParam();
 		dip.Filter = DrawImageFilter.Point;
 

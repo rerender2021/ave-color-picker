@@ -12,7 +12,6 @@ export class ZoomView extends Component {
 
 	constructor(window: Window) {
 		super(window);
-		this.view = new Placeholder(this.window);
 		this.onCreate();
 	}
 
@@ -31,6 +30,8 @@ export class ZoomView extends Component {
     }
 
 	private onCreate() {
+		this.view = new Placeholder(this.window);
+
 		const dip = new DrawImageParam();
 		dip.Filter = DrawImageFilter.Point;
 
@@ -60,7 +61,7 @@ export class ZoomView extends Component {
 				if (dip.SourceRect.Bottom >= height) dip.SourceRect.h = height - dip.SourceRect.y;
 				dip.TargetSize.x = dip.SourceRect.w * blockSize;
 				dip.TargetSize.y = dip.SourceRect.h * blockSize;
-				painter.DrawImageEx(this.image, v, DrawImageFlag.TargetSize | DrawImageFlag.SourceRect | DrawImageFlag.Filter, dip);
+				painter.DrawImageEx(image, v, DrawImageFlag.TargetSize | DrawImageFlag.SourceRect | DrawImageFlag.Filter, dip);
 			}
 			painter.SetPenColor(new Vec4(0, 0, 0, 255));
 			painter.DrawRectangle(rc.x, rc.y, rc.w, rc.h);
