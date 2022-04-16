@@ -12,7 +12,22 @@ export function getAppLayout(window: Window) {
 	};
 
 	const pixelLayout = {
-		rows: "128dpx 4dpx 128dpx 4dpx 32dpx 4dpx 16dpx 4dpx 16dpx 4dpx 32dpx 4dpx 32dpx 1 16dpx 4dpx 16dpx 4dpx 16dpx 4dpx 16dpx 4dpx 16dpx",
+		// prettier-ignore
+		rows: [
+			"128dpx", /* mini view  */ "4dpx",
+			"128dpx", /* zoom view  */ "4dpx",
+			"32dpx",  /* color view */ "4dpx",
+			"16dpx",  /* pixel pos  */ "4dpx",
+			"16dpx",  /* pixel rgba */ "4dpx",
+			"32dpx",  /* open file  */ "4dpx",
+			"32dpx",  /* paste 		*/
+			"1", 
+			"16dpx",  /* move: wasd */ "4dpx",
+			"16dpx",  /* lock color */ "4dpx",
+			"16dpx",  /* open file  */ "4dpx",
+			"16dpx",  /* paste      */ "4dpx",
+			"16dpx",  /* drop png   */
+		].join(" "),
 		columns: "1",
 		areas: {
 			//
