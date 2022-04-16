@@ -35,6 +35,7 @@ export class MiniView extends Component {
 			const { image, pager } = this;
 			const width = image.GetWidth();
 			const height = image.GetHeight();
+
 			const rcImage = new Rect(0, 0, width, height);
 			const rcContainer = new Rect(rc.x, rc.y, rc.w, rc.h);
 			rcImage.UniformScale(rcContainer);

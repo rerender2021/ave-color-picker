@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { PNG, PNGWithMetadata } from "pngjs";
 import { readPixel } from "./utils";
 import { MiniView } from "./mini-view";
+import { ZoomView } from "./zoom-view";
 
 export class Program {
 	app: App;
@@ -13,6 +14,7 @@ export class Program {
 	pager: Pager;
 	png: PNGWithMetadata;
 	miniView: MiniView;
+	zoomView: ZoomView;
 
 	constructor() {
 		this.app = new App();
@@ -49,7 +51,9 @@ export class Program {
 		const imgcp = new Byo2ImageCreation();
 		imgcp.DataType = Byo2ImageDataType.Coded;
 		imgcp.Data = source;
+
 		this.image = new Byo2Image(this.window, imgcp);
+		this.zoomView.track({ image: this.image });
 		this.miniView.track({ pager: this.pager, image: this.image });
 		this.picture.SetImage(this.image);
 		this.pager.SetContentSize(new Vec2(this.png.width, this.png.height));
@@ -73,39 +77,7 @@ export class Program {
 			dip.Filter = DrawImageFilter.Point;
 
 			this.miniView = new MiniView(window);
-
-			let vPixelPos = new Vec2(-1, -1);
-			const zoomView = new Placeholder(window);
-			zoomView.OnPaintPost((sender, painter, rc) => {
-				const blockSize = rc.w / 9;
-				if (vPixelPos.x >= 0 && vPixelPos.y >= 0 && vPixelPos.x < this.png.width && vPixelPos.y < this.png.height) {
-					const v = Vec2.Zero;
-					dip.SourceRect.x = vPixelPos.x - 4;
-					dip.SourceRect.y = vPixelPos.y - 4;
-					dip.SourceRect.w = 9;
-					dip.SourceRect.h = 9;
-					dip.TargetSize.x = rc.w;
-					dip.TargetSize.y = rc.h;
-					if (dip.SourceRect.x < 0) {
-						v.x -= blockSize * dip.SourceRect.x;
-						dip.SourceRect.x = 0;
-					}
-					if (dip.SourceRect.y < 0) {
-						v.y -= blockSize * dip.SourceRect.y;
-						dip.SourceRect.y = 0;
-					}
-					if (dip.SourceRect.Right >= this.png.width) dip.SourceRect.w = this.png.width - dip.SourceRect.x;
-					if (dip.SourceRect.Bottom >= this.png.height) dip.SourceRect.h = this.png.height - dip.SourceRect.y;
-					dip.TargetSize.x = dip.SourceRect.w * blockSize;
-					dip.TargetSize.y = dip.SourceRect.h * blockSize;
-					painter.DrawImageEx(this.image, v, DrawImageFlag.TargetSize | DrawImageFlag.SourceRect | DrawImageFlag.Filter, dip);
-				}
-				painter.SetPenColor(new Vec4(0, 0, 0, 255));
-				painter.DrawRectangle(rc.x, rc.y, rc.w, rc.h);
-				painter.DrawRectangle((rc.w - blockSize) * 0.5, (rc.h - blockSize) * 0.5, blockSize, blockSize);
-				painter.SetPenColor(new Vec4(255, 255, 255, 255));
-				painter.DrawRectangle((rc.w - blockSize) * 0.5 - 1, (rc.h - blockSize) * 0.5 - 1, blockSize + 2, blockSize + 2);
-			});
+			this.zoomView = new ZoomView(window);
 
 			const colorView = new ColorView(window);
 
@@ -120,7 +92,7 @@ export class Program {
 			const txtRgba = createTextBox();
 
 			const onPointerMove = (pos: Vec2) => {
-				vPixelPos = pos;
+				this.zoomView.updatePixelPos(pos);
 				const color = readPixel(this.png, pos.x, pos.y);
 				console.log(pos, color);
 
@@ -171,7 +143,7 @@ export class Program {
 
 			let row = -2;
 			pixelGrid.ControlAdd(this.miniView.control).SetGrid(0, (row += 2));
-			pixelGrid.ControlAdd(zoomView).SetGrid(0, (row += 2));
+			pixelGrid.ControlAdd(this.zoomView.control).SetGrid(0, (row += 2));
 			pixelGrid.ControlAdd(colorView).SetGrid(0, (row += 2));
 			pixelGrid
 				.ControlAdd(txtPixelPos)
