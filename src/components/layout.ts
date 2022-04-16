@@ -1,13 +1,13 @@
 import { DpiSize, Grid, IControl, Window } from "ave-ui";
 import { Component } from "./component";
 
-export interface IGridLayout<Areas extends string = string> {
+export interface IGridLayout {
 	/**
 	 * whitespace sperated sizes, eg. "1 50px 100dpx"
 	 */
 	columns?: string;
 	rows?: string;
-	areas?: Record<Areas, GridArea>;
+	areas?: Record<string, GridArea>;
 }
 
 export type GridArea = {
@@ -24,8 +24,8 @@ export type GridArea = {
 };
 
 export class GridLayout extends Component {
-	grid: Grid;
-	layout: IGridLayout;
+	private grid: Grid;
+	private layout: IGridLayout;
 
 	constructor(window: Window, layout: IGridLayout) {
 		super(window);
@@ -38,7 +38,13 @@ export class GridLayout extends Component {
 		return this.grid;
 	}
 
-	createGrid() {
+	addControl(control: IControl, area: string | GridArea) {
+		const childArea = typeof area === "string" ? this.getArea(area) : area;
+		const gridControl = this.grid.ControlAdd(control).SetGrid(childArea.x, childArea.y, childArea.xspan, childArea.yspan);
+		return gridControl;
+	}
+
+	private createGrid() {
 		const { columns, rows } = this.layout;
 
 		//
@@ -51,12 +57,6 @@ export class GridLayout extends Component {
 		rows?.trim()
 			.split(" ")
 			.forEach((row) => this.grid.RowAdd(parseSize(row)));
-	}
-
-	addControl(control: IControl, area: string | GridArea) {
-		const childArea = typeof area === "string" ? this.getArea(area) : area;
-		const gridControl = this.grid.ControlAdd(control).SetGrid(childArea.x, childArea.y, childArea.xspan, childArea.yspan);
-		return gridControl;
 	}
 
 	private getArea(name: string) {

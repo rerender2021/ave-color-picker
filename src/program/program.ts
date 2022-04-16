@@ -1,4 +1,4 @@
-import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Grid, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId } from "ave-ui";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId } from "ave-ui";
 import { MiniView, ZoomView, ImageView, GridLayout, IGridLayout } from "../components";
 import { assetPath, readAsBuffer } from "../utils";
 
@@ -102,14 +102,14 @@ export class Program {
 				if (!bLock) onPointerMove(mp.Position);
 			});
 
-			type AppAreas = "image" | "pixel";
-			const appLayout: IGridLayout<AppAreas> = {
+			const appAreas = {
+				image: { x: 0, y: 0 },
+				pixel: { x: 1, y: 0 },
+			};
+			const appLayout: IGridLayout = {
 				rows: "1",
 				columns: "1 128dpx",
-				areas: {
-					image: { x: 0, y: 0 },
-					pixel: { x: 1, y: 0 },
-				},
+				areas: appAreas,
 			};
 
 			const container = new GridLayout(window, appLayout);
@@ -119,7 +119,7 @@ export class Program {
 			this.pager.SetContentHorizontalAlign(AlignType.Center);
 			this.pager.SetContentVerticalAlign(AlignType.Center);
 
-			container.addControl(this.pager, appLayout.areas.image);
+			container.addControl(this.pager, appAreas.image);
 
 			const btnOpen = new Button(window);
 			btnOpen.SetText("Open File");
@@ -129,28 +129,38 @@ export class Program {
 			btnPaste.SetText("Paste");
 			btnPaste.OnClick(() => this.pastePicture());
 
-			const pixelGrid = new Grid(window);
-			pixelGrid.ColAddSlice(1);
-			pixelGrid.RowAddDpx(128, 4, 128, 4, 32, 4, 16, 4, 16, 4, 32, 4, 32);
-			pixelGrid.RowAddSlice(1);
-			pixelGrid.RowAddDpx(16, 4, 16, 4, 16, 4, 16, 4, 16);
+			const pixelAreas = {
+				//
+				miniView: { x: 0, y: 0 },
+				zoomView: { x: 0, y: 2 },
+				colorView: { x: 0, y: 4 },
+				pixelPos: { x: 0, y: 6 },
+				pixelRgba: { x: 0, y: 8 },
+				openFile: { x: 0, y: 10 },
+				paste: { x: 0, y: 12 },
+				//
+				usageMove: { x: 0, y: 14 },
+				usageLockColor: { x: 0, y: 16 },
+				usageOpenFile: { x: 0, y: 18 },
+				usagePaste: { x: 0, y: 20 },
+				usageDrop: { x: 0, y: 22 },
+			};
+			const pixelLayout: IGridLayout = {
+				rows: "128dpx 4dpx 128dpx 4dpx 32dpx 4dpx 16dpx 4dpx 16dpx 4dpx 32dpx 4dpx 32dpx 1 16dpx 4dpx 16dpx 4dpx 16dpx 4dpx 16dpx 4dpx 16dpx",
+				columns: "1",
+				areas: pixelAreas,
+			};
+			const pixelGrid = new GridLayout(window, pixelLayout);
+
+			pixelGrid.addControl(this.miniView.control, pixelAreas.miniView);
+			pixelGrid.addControl(this.zoomView.control, pixelAreas.zoomView);
+			pixelGrid.addControl(colorView, pixelAreas.colorView);
 
 			const marginLeft = new DpiMargin(DpiSize.FromPixelScaled(4), DpiSize.Zero, DpiSize.Zero, DpiSize.Zero);
-
-			let row = -2;
-			pixelGrid.ControlAdd(this.miniView.control).SetGrid(0, (row += 2));
-			pixelGrid.ControlAdd(this.zoomView.control).SetGrid(0, (row += 2));
-			pixelGrid.ControlAdd(colorView).SetGrid(0, (row += 2));
-			pixelGrid
-				.ControlAdd(txtPixelPos)
-				.SetGrid(0, (row += 2))
-				.SetMargin(marginLeft);
-			pixelGrid
-				.ControlAdd(txtRgba)
-				.SetGrid(0, (row += 2))
-				.SetMargin(marginLeft);
-			pixelGrid.ControlAdd(btnOpen).SetGrid(0, (row += 2));
-			pixelGrid.ControlAdd(btnPaste).SetGrid(0, (row += 2));
+			pixelGrid.addControl(txtPixelPos, pixelAreas.pixelPos).SetMargin(marginLeft);
+			pixelGrid.addControl(txtRgba, pixelAreas.pixelRgba).SetMargin(marginLeft);
+			pixelGrid.addControl(btnOpen, pixelAreas.openFile);
+			pixelGrid.addControl(btnPaste, pixelAreas.paste);
 
 			const createLabel = (s: string) => {
 				const lbl = new Label(window);
@@ -158,28 +168,13 @@ export class Program {
 				return lbl;
 			};
 
-			pixelGrid
-				.ControlAdd(createLabel("WSAD: Move by pixel"))
-				.SetGrid(0, (row += 2))
-				.SetMargin(marginLeft);
-			pixelGrid
-				.ControlAdd(createLabel("Space/Click: Lock result"))
-				.SetGrid(0, (row += 2))
-				.SetMargin(marginLeft);
-			pixelGrid
-				.ControlAdd(createLabel("F: Open File"))
-				.SetGrid(0, (row += 2))
-				.SetMargin(marginLeft);
-			pixelGrid
-				.ControlAdd(createLabel("V: Paste"))
-				.SetGrid(0, (row += 2))
-				.SetMargin(marginLeft);
-			pixelGrid
-				.ControlAdd(createLabel("Drop a png to open"))
-				.SetGrid(0, (row += 2))
-				.SetMargin(marginLeft);
+			pixelGrid.addControl(createLabel("WSAD: Move by pixel"), pixelAreas.usageMove).SetMargin(marginLeft);
+			pixelGrid.addControl(createLabel("Space/Click: Lock result"), pixelAreas.usageLockColor).SetMargin(marginLeft);
+			pixelGrid.addControl(createLabel("F: Open File"), pixelAreas.usageOpenFile).SetMargin(marginLeft);
+			pixelGrid.addControl(createLabel("V: Paste"), pixelAreas.usagePaste).SetMargin(marginLeft);
+			pixelGrid.addControl(createLabel("Drop a png to open"), pixelAreas.usageDrop).SetMargin(marginLeft);
 
-			container.addControl(pixelGrid, appLayout.areas.pixel);
+			container.addControl(pixelGrid.control, appAreas.pixel);
 			window.SetContent(container.control);
 
 			// Move cursor
