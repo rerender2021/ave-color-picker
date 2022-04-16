@@ -1,15 +1,15 @@
-import { App, WindowCreation, Window, WindowFlag, Picture, ColorView, Vec4, TextBox, Pager, StretchMode, Grid, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, Byo2Image, Byo2ImageCreation, Byo2ImageDataType, Placeholder, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, DrawImageFilter, DrawImageFlag, DrawImageParam, ResourceSource, InputModifier, CultureId } from "ave-ui";
-import * as path from "path";
-import * as fs from "fs";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Grid, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId } from "ave-ui";
 import { MiniView } from "./mini-view";
 import { ZoomView } from "./zoom-view";
 import { NativeImage } from "./native-image";
+import { ImageView } from "./image-view";
+import { assetPath, readAsBuffer } from "./utils";
 
 export class Program {
 	app: App;
 	window: Window;
 	image: NativeImage;
-	picture: Picture;
+	imageView: ImageView;
 	pager: Pager;
 	miniView: MiniView;
 	zoomView: ZoomView;
@@ -43,14 +43,14 @@ export class Program {
 	}
 
 	openFile(file: string) {
-		const buffer = fs.readFileSync(file);
-		this.image = new NativeImage(this.window, buffer);
+		this.image = new NativeImage(this.window, readAsBuffer(file));
+		this.imageView.updateImage(this.image);
 
 		const nativeImage = this.image.native;
 		this.zoomView.track({ image: nativeImage });
 		this.miniView.track({ pager: this.pager, image: nativeImage });
-		this.picture.SetImage(nativeImage);
-		this.pager.SetContentSize(new Vec2(nativeImage.GetWidth(), nativeImage.GetHeight()));
+
+		this.pager.SetContentSize(new Vec2(this.imageView.width, this.imageView.height));
 	}
 
 	async browseOpenFile() {
@@ -64,12 +64,7 @@ export class Program {
 
 	OnCreateContent() {
 		this.window.OnCreateContent((window) => {
-			this.picture = new Picture(window);
-			this.picture.SetStretchMode(StretchMode.Center);
-
-			const dip = new DrawImageParam();
-			dip.Filter = DrawImageFilter.Point;
-
+			this.imageView = new ImageView(window);
 			this.miniView = new MiniView(window);
 			this.zoomView = new ZoomView(window);
 
@@ -95,15 +90,16 @@ export class Program {
 				txtRgba.SetText(`rgba(${color.r},${color.g},${color.b},${color.a})`);
 			};
 			let bLock: boolean = false;
-			this.picture.OnPointerEnter((sender, mp) => {
+
+			this.imageView.control.OnPointerEnter((sender, mp) => {
 				bLock = false;
 			});
-			this.picture.OnPointerPress((sender, mp) => {
+			this.imageView.control.OnPointerPress((sender, mp) => {
 				if (mp.Button == PointerButton.First) {
 					bLock = !bLock;
 				}
 			});
-			this.picture.OnPointerMove((sender, mp) => {
+			this.imageView.control.OnPointerMove((sender, mp) => {
 				if (!bLock) onPointerMove(mp.Position);
 			});
 
@@ -113,7 +109,7 @@ export class Program {
 			container.ColAddDpx(128);
 
 			this.pager = new Pager(window);
-			this.pager.SetContent(this.picture);
+			this.pager.SetContent(this.imageView.control);
 			this.pager.SetContentHorizontalAlign(AlignType.Center);
 			this.pager.SetContentVerticalAlign(AlignType.Center);
 
@@ -184,7 +180,7 @@ export class Program {
 			// Move cursor
 			const moveCursor = (v: Vec2) => {
 				window.GetPlatform().PointerSetPosition(v);
-				const rc = this.picture.MapRect(Rect.Empty, false);
+				const rc = this.imageView.control.MapRect(Rect.Empty, false);
 				onPointerMove(new Vec2(v.x, v.y).Sub(rc.Position));
 			};
 			const hkW = window.HotkeyRegister(KbKey.W, 0);
@@ -236,7 +232,7 @@ export class Program {
 				this.openFile(dc.FileGet()[0]);
 			});
 
-			this.openFile(path.resolve(__dirname, "../assets/wallpaper-full.png"));
+			this.openFile(assetPath("wallpaper-full.png"));
 			return true;
 		});
 	}

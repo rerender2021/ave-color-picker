@@ -1,7 +1,7 @@
 import { Window } from "ave-ui";
 
 export class Component {
-	window: Window;
+	protected window: Window;
 	constructor(window: Window) {
 		this.window = window;
 	}

@@ -6,9 +6,9 @@ export interface IMiniViewProps {
 }
 
 export class ZoomView extends Component {
-	view: Placeholder;
-	image: Byo2Image;
-    pixelPos: Vec2;
+	private view: Placeholder;
+	private image: Byo2Image;
+    private pixelPos: Vec2;
 
 	constructor(window: Window) {
 		super(window);

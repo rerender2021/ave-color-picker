@@ -3,8 +3,8 @@ import { PNG, PNGWithMetadata } from "pngjs";
 import { Component } from "./component";
 
 export class NativeImage extends Component {
-	byo2: IByo2Image;
-	png: PNGWithMetadata;
+	private byo2: IByo2Image;
+	private png: PNGWithMetadata;
 
 	// cp: creation param
 	constructor(window: Window, buffer: Buffer) {

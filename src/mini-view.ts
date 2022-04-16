@@ -7,9 +7,9 @@ export interface IMiniViewProps {
 }
 
 export class MiniView extends Component {
-	view: Placeholder;
-	image: Byo2Image;
-	pager: Pager;
+	private view: Placeholder;
+	private image: Byo2Image;
+	private pager: Pager;
 
 	constructor(window: Window) {
 		super(window);
