@@ -1,5 +1,5 @@
 import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Grid, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId } from "ave-ui";
-import { MiniView, ZoomView, ImageView } from "../components";
+import { MiniView, ZoomView, ImageView, GridLayout, IGridLayout } from "../components";
 import { assetPath, readAsBuffer } from "../utils";
 
 export class Program {
@@ -102,17 +102,24 @@ export class Program {
 				if (!bLock) onPointerMove(mp.Position);
 			});
 
-			const container = new Grid(window);
-			container.RowAddSlice(1);
-			container.ColAddSlice(1);
-			container.ColAddDpx(128);
+			type AppAreas = "image" | "pixel";
+			const appLayout: IGridLayout<AppAreas> = {
+				rows: "1",
+				columns: "1 128dpx",
+				areas: {
+					image: { x: 0, y: 0 },
+					pixel: { x: 1, y: 0 },
+				},
+			};
+
+			const container = new GridLayout(window, appLayout);
 
 			this.pager = new Pager(window);
 			this.pager.SetContent(this.imageView.control);
 			this.pager.SetContentHorizontalAlign(AlignType.Center);
 			this.pager.SetContentVerticalAlign(AlignType.Center);
 
-			container.ControlAdd(this.pager).SetGrid(0, 0);
+			container.addControl(this.pager, appLayout.areas.image);
 
 			const btnOpen = new Button(window);
 			btnOpen.SetText("Open File");
@@ -148,7 +155,6 @@ export class Program {
 			const createLabel = (s: string) => {
 				const lbl = new Label(window);
 				lbl.SetText(s);
-				//lbl.SetAlignHorz(AlignType.Far);
 				return lbl;
 			};
 
@@ -173,8 +179,8 @@ export class Program {
 				.SetGrid(0, (row += 2))
 				.SetMargin(marginLeft);
 
-			container.ControlAdd(pixelGrid).SetGrid(1, 0);
-			window.SetContent(container);
+			container.addControl(pixelGrid, appLayout.areas.pixel);
+			window.SetContent(container.control);
 
 			// Move cursor
 			const moveCursor = (v: Vec2) => {
