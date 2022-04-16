@@ -23,7 +23,7 @@ export type GridArea = {
 	yspan?: number;
 };
 
-export class GridLayout extends Component {
+export class GridLayout<AreaName extends string = string> extends Component {
 	private grid: Grid;
 	private layout: IGridLayout;
 
@@ -32,6 +32,10 @@ export class GridLayout extends Component {
 		this.grid = new Grid(this.window);
 		this.layout = layout;
 		this.createGrid();
+	}
+
+	get areas() {
+		return this.layout.areas as Record<AreaName, GridArea>;
 	}
 
 	get control() {
