@@ -56,7 +56,13 @@ export class Program {
 	}
 
 	OnCreateContent() {
+		const iconDataMap = {
+			WindowIcon: [assetPath("color-wheel.png")],
+		};
+		const resMap = this.app.CreateResourceMap(this.app, [16], iconDataMap);
+
 		this.window.OnCreateContent((window) => {
+			window.SetIcon(resMap.WindowIcon);
 			this.imageView = new ImageView(window);
 			this.miniView = new MiniView(window);
 			this.zoomView = new ZoomView(window);
