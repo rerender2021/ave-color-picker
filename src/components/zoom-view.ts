@@ -1,7 +1,7 @@
 import { Byo2Image, DrawImageFilter, DrawImageFlag, DrawImageParam, Placeholder, Vec2, Vec4, Window } from "ave-ui";
 import { Component } from "./component";
 
-export interface IMiniViewProps {
+export interface IZoomViewProps {
 	image: Byo2Image;
 }
 
@@ -19,7 +19,7 @@ export class ZoomView extends Component {
 		return this.view;
 	}
 
-	track(props: IMiniViewProps) {
+	track(props: IZoomViewProps) {
 		const { image } = props;
 		this.image = image;
         this.updatePixelPos(new Vec2(-1, -1));

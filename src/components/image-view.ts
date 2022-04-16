@@ -11,25 +11,33 @@ export class ImageView extends Component {
 		this.onCreate();
 	}
 
-    get control() {
+	get control() {
 		return this.view;
 	}
 
-    get width() {
-        return this.image.native.GetWidth();
-    }
+	get native() {
+		return this.image.native;
+	}
 
-    get height() {
-        return this.image.native.GetHeight();
-    }
+	get width() {
+		return this.image.native.GetWidth();
+	}
+
+	get height() {
+		return this.image.native.GetHeight();
+	}
+	
+	readPixel(x: number, y: number) {
+		return this.image.readPixel(x, y);
+	}
 
 	private onCreate() {
 		this.view = new Picture(this.window);
 		this.view.SetStretchMode(StretchMode.Center);
 	}
 
-    updateImage(image: NativeImage) {
-        this.image = image;
-        this.view.SetImage(this.image.native);
-    }
+	updateImage(buffer: Buffer) {
+		this.image = new NativeImage(this.window, buffer);
+		this.view.SetImage(this.image.native);
+	}
 }

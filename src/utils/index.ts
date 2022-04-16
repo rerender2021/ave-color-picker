@@ -7,7 +7,7 @@ export function readAsBuffer(filePath: string) {
 }
 
 export function assetPath(relative: string) {
-    const root = path.resolve(__dirname, "../assets");
+    const root = path.resolve(__dirname, "../../assets");
     const absolute = path.resolve(root, relative);
     return absolute;
 }

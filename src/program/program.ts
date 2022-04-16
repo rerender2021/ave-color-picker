@@ -1,18 +1,15 @@
 import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Grid, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId } from "ave-ui";
-import { MiniView } from "./mini-view";
-import { ZoomView } from "./zoom-view";
-import { NativeImage } from "./native-image";
-import { ImageView } from "./image-view";
-import { assetPath, readAsBuffer } from "./utils";
+import { MiniView, ZoomView, ImageView } from "../components";
+import { assetPath, readAsBuffer } from "../utils";
 
 export class Program {
 	app: App;
 	window: Window;
-	image: NativeImage;
+
 	imageView: ImageView;
-	pager: Pager;
 	miniView: MiniView;
 	zoomView: ZoomView;
+	pager: Pager;
 
 	constructor() {
 		this.app = new App();
@@ -43,13 +40,9 @@ export class Program {
 	}
 
 	openFile(file: string) {
-		this.image = new NativeImage(this.window, readAsBuffer(file));
-		this.imageView.updateImage(this.image);
-
-		const nativeImage = this.image.native;
-		this.zoomView.track({ image: nativeImage });
-		this.miniView.track({ pager: this.pager, image: nativeImage });
-
+		this.imageView.updateImage(readAsBuffer(file));
+		this.zoomView.track({ image: this.imageView.native });
+		this.miniView.track({ pager: this.pager, image: this.imageView.native });
 		this.pager.SetContentSize(new Vec2(this.imageView.width, this.imageView.height));
 	}
 
@@ -82,7 +75,7 @@ export class Program {
 
 			const onPointerMove = (pos: Vec2) => {
 				this.zoomView.updatePixelPos(pos);
-				const color = this.image.readPixel(pos.x, pos.y);
+				const color = this.imageView.readPixel(pos.x, pos.y);
 				console.log(pos, color);
 
 				colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
