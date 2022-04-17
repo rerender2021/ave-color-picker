@@ -254,8 +254,11 @@ export class Program {
 			const aveImage = clipboard.GetImage();
 			this.imageView.updateRawImage(aveImage);
 			this.track();
+		} else if (clipboard.HasFile()) {
+			const [file] = clipboard.GetFile();
+			if (file && file.endsWith("png")) {
+				this.openFile(file);
+			}
 		}
-
-		// this.window.GetCommonUi().Message("TODO: Paste picture from clipboard.", "", MessageIcon.None, MessageButton.Ok, "color-picker");
 	}
 }
