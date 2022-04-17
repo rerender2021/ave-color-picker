@@ -1,8 +1,8 @@
-import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout } from "ave-ui";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType } from "ave-ui";
 import { MiniView, ZoomView, ImageView } from "../components";
 import { assetPath, readAsBuffer } from "../utils";
 import { getAppLayout } from "./layout";
-import * as Color from "color";	
+import * as Color from "color";
 import { Ii18n, initI18n, KeyOfLang } from "./i18n";
 
 export class Program {
@@ -49,7 +49,8 @@ export class Program {
 
 		const iconDataMap = {
 			WindowIcon: [assetPath("color-wheel.png")],
-			OpenFile: [assetPath("file-open.png")]
+			OpenFile: [assetPath("file-open.png")],
+			Language: [assetPath("language.png")],
 		};
 		const resMap = this.app.CreateResourceMap(this.app, [16], iconDataMap);
 
@@ -82,7 +83,7 @@ export class Program {
 
 			this.btnOpen = new Button(window, "OpenFile" as KeyOfLang);
 			this.btnOpen.SetVisualTextLayout(VisualTextLayout.HorzVisualText);
-			this.btnOpen.SetVisual(window.CreateManagedIcon(new IconSource(resMap.OpenFile, 16)))
+			this.btnOpen.SetVisual(window.CreateManagedIcon(new IconSource(resMap.OpenFile, 16)));
 			this.btnOpen.OnClick(() => this.browseOpenFile());
 
 			this.btnPaste = new Button(window, "Paste" as KeyOfLang);
@@ -90,6 +91,12 @@ export class Program {
 
 			const container = this.onCreateLayout(window);
 			window.SetContent(container);
+
+			//
+			const toolbar = new ToolBar(window);
+			toolbar.SetBackground(false);
+			toolbar.ToolInsert(new ToolBarItem(1, ToolBarItemType.ButtonDrop, window.CacheIcon(new IconSource(resMap.Language, 16))), -1);
+			window.GetFrame().SetToolBarRight(toolbar);
 
 			this.openFile(assetPath("wallpaper-full.png"));
 			return true;
@@ -212,7 +219,7 @@ export class Program {
 			if (!this.lockColor) this.onPointerMove(mp.Position);
 		});
 	}
-	
+
 	openFile(file: string) {
 		this.imageView.updateImage(readAsBuffer(file));
 		this.zoomView.track({ image: this.imageView.native });
