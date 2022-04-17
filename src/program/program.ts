@@ -3,10 +3,12 @@ import { MiniView, ZoomView, ImageView } from "../components";
 import { assetPath, readAsBuffer } from "../utils";
 import { getAppLayout } from "./layout";
 import * as Color from "color";	
+import { Ii18n, initI18n, KeyOfLang } from "./i18n";
 
 export class Program {
 	app: App;
 	window: Window;
+	i18n: Ii18n;
 
 	imageView: ImageView;
 	pager: Pager;
@@ -22,16 +24,9 @@ export class Program {
 
 	constructor() {
 		this.app = new App();
-		// prettier-ignore
-		this.app.LangSetDefaultString(CultureId.en_us, {
-			"CoOk"      /**/: "OK",
-			"CoCut"    	/**/: "Cut",
-			"CoCopy"   	/**/: "Copy",
-			"CoPaste"  	/**/: "Paste",
-			"CoDelete" 	/**/: "Delete",
-			"CoUndo"   	/**/: "Undo",
-			"CoSelAll" 	/**/: "Select All",
-		});
+		this.i18n = initI18n(this.app);
+		// this.i18n.switch(CultureId.zh_cn);
+		this.i18n.switch(CultureId.en_us);
 
 		const cpWindow = new WindowCreation();
 		cpWindow.Title = "Color Picker";
@@ -85,14 +80,12 @@ export class Program {
 			this.pager.SetContentHorizontalAlign(AlignType.Center);
 			this.pager.SetContentVerticalAlign(AlignType.Center);
 
-			this.btnOpen = new Button(window);
-			this.btnOpen.SetText("Open File");
+			this.btnOpen = new Button(window, "OpenFile" as KeyOfLang);
 			this.btnOpen.SetVisualTextLayout(VisualTextLayout.HorzVisualText);
 			this.btnOpen.SetVisual(window.CreateManagedIcon(new IconSource(resMap.OpenFile, 16)))
 			this.btnOpen.OnClick(() => this.browseOpenFile());
 
-			this.btnPaste = new Button(window);
-			this.btnPaste.SetText("Paste");
+			this.btnPaste = new Button(window, "Paste" as KeyOfLang);
 			this.btnPaste.OnClick(() => this.pastePicture());
 
 			const container = this.onCreateLayout(window);
