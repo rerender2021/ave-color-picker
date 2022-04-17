@@ -1,4 +1,4 @@
-import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType, Menu, MenuItem, MenuType } from "ave-ui";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType, Menu, MenuItem, MenuType, AveGetClipboard } from "ave-ui";
 import { MiniView, ZoomView, ImageView } from "../components";
 import { assetPath, readAsBuffer } from "../utils";
 import { getAppLayout } from "./layout";
@@ -234,6 +234,10 @@ export class Program {
 
 	openFile(file: string) {
 		this.imageView.updateImage(readAsBuffer(file));
+		this.track();
+	}
+
+	track() {
 		this.zoomView.track({ image: this.imageView.native });
 		this.miniView.track({ pager: this.pager, image: this.imageView.native });
 		this.pager.SetContentSize(new Vec2(this.imageView.width, this.imageView.height));
@@ -245,6 +249,13 @@ export class Program {
 	}
 
 	pastePicture() {
-		this.window.GetCommonUi().Message("TODO: Paste picture from clipboard.", "", MessageIcon.None, MessageButton.Ok, "color-picker");
+		const clipboard = AveGetClipboard();
+		if (clipboard.HasImage()) {
+			const aveImage = clipboard.GetImage();
+			this.imageView.updateRawImage(aveImage);
+			this.track();
+		}
+
+		// this.window.GetCommonUi().Message("TODO: Paste picture from clipboard.", "", MessageIcon.None, MessageButton.Ok, "color-picker");
 	}
 }
