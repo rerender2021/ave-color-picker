@@ -1,6 +1,6 @@
-import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType, Menu, MenuItem, MenuType, AveGetClipboard } from "ave-ui";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType, Menu, MenuItem, MenuType, AveGetClipboard, AveImage, ResourceSource } from "ave-ui";
 import { MiniView, ZoomView, ImageView } from "../components";
-import { assetPath, readAsBuffer } from "../utils";
+import { assetPath } from "../utils";
 import { getAppLayout } from "./layout";
 import * as Color from "color";
 import { Ii18n, initI18n, KeyOfLang } from "./i18n";
@@ -233,7 +233,10 @@ export class Program {
 	}
 
 	openFile(file: string) {
-		this.imageView.updateImage(readAsBuffer(file));
+		const codec = this.app.GetImageCodec();
+		const aveImage = codec.Open(ResourceSource.FromFilePath(file));
+		// TODO: add from native
+		this.imageView.updateRawImage(AveImage.FromNative(aveImage));
 		this.track();
 	}
 

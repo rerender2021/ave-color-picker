@@ -14,7 +14,6 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.21",
-    "@types/pngjs": "^6.0.1",
     "ave-pack": "^0.9.2",
     "copyfiles": "^2.4.1",
     "del-cli": "^4.0.1",
@@ -23,7 +22,6 @@
   },
   "dependencies": {
     "ave-ui": "file:ave-ui-0.1.2.tgz",
-    "color": "^4.2.3",
-    "pngjs": "^6.0.0"
+    "color": "^4.2.3"
   }
 }
