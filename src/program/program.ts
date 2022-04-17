@@ -1,4 +1,4 @@
-import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId } from "ave-ui";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout } from "ave-ui";
 import { MiniView, ZoomView, ImageView } from "../components";
 import { assetPath, readAsBuffer } from "../utils";
 import { getAppLayout } from "./layout";
@@ -52,6 +52,7 @@ export class Program {
 
 		const iconDataMap = {
 			WindowIcon: [assetPath("color-wheel.png")],
+			OpenFile: [assetPath("file-open.png")]
 		};
 		const resMap = this.app.CreateResourceMap(this.app, [16], iconDataMap);
 
@@ -83,6 +84,8 @@ export class Program {
 
 			this.btnOpen = new Button(window);
 			this.btnOpen.SetText("Open File");
+			this.btnOpen.SetVisualTextLayout(VisualTextLayout.HorzVisualText);
+			this.btnOpen.SetVisual(window.CreateManagedIcon(new IconSource(resMap.OpenFile, 16)))
 			this.btnOpen.OnClick(() => this.browseOpenFile());
 
 			this.btnPaste = new Button(window);
