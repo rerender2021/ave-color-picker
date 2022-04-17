@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "ave-ui": "^0.1.2",
+    "color": "^4.2.3",
     "pngjs": "^6.0.0"
   }
 }
