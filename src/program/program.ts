@@ -1,4 +1,4 @@
-import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType } from "ave-ui";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType, Menu, MenuItem, MenuType } from "ave-ui";
 import { MiniView, ZoomView, ImageView } from "../components";
 import { assetPath, readAsBuffer } from "../utils";
 import { getAppLayout } from "./layout";
@@ -92,10 +92,18 @@ export class Program {
 			const container = this.onCreateLayout(window);
 			window.SetContent(container);
 
+			const menuLang = new Menu(window);
+			// menuLang.OnClick((sender, nId) => {
+			// 	this.i18n.switch(nId - 1);
+			// });
+			menuLang.InsertItem(new MenuItem(CultureId.en_us + 1, MenuType.Text, 0, "English (US)"));
+			menuLang.InsertItem(new MenuItem(CultureId.zh_cn + 1, MenuType.Text, 0, "简体中文"));
+
 			//
 			const toolbar = new ToolBar(window);
 			toolbar.SetBackground(false);
 			toolbar.ToolInsert(new ToolBarItem(1, ToolBarItemType.ButtonDrop, window.CacheIcon(new IconSource(resMap.Language, 16))), -1);
+			toolbar.DropSetById(1, menuLang);
 			window.GetFrame().SetToolBarRight(toolbar);
 
 			this.openFile(assetPath("wallpaper-full.png"));
