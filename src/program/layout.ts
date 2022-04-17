@@ -18,6 +18,7 @@ export function getAppLayout(window: Window) {
 			"128dpx", /* zoom view  */ "4dpx",
 			"32dpx",  /* color view */ "4dpx",
 			"16dpx",  /* pixel pos  */ "4dpx",
+			"16dpx",  /* pixel hex */ "4dpx",
 			"16dpx",  /* pixel rgba */ "4dpx",
 			"32dpx",  /* open file  */ "4dpx",
 			"32dpx",  /* paste 		*/
@@ -35,15 +36,16 @@ export function getAppLayout(window: Window) {
 			zoomView: { x: 0, y: 2 },
 			colorView: { x: 0, y: 4 },
 			pixelPos: { x: 0, y: 6 },
-			pixelRgba: { x: 0, y: 8 },
-			openFile: { x: 0, y: 10 },
-			paste: { x: 0, y: 12 },
+			pixelHex: { x: 0, y: 8 },
+			pixelRgba: { x: 0, y: 10 },
+			openFile: { x: 0, y: 12 },
+			paste: { x: 0, y: 14 },
 			//
-			usageMove: { x: 0, y: 14 },
-			usageLockColor: { x: 0, y: 16 },
-			usageOpenFile: { x: 0, y: 18 },
-			usagePaste: { x: 0, y: 20 },
-			usageDrop: { x: 0, y: 22 },
+			usageMove: { x: 0, y: 16 },
+			usageLockColor: { x: 0, y: 18 },
+			usageOpenFile: { x: 0, y: 20 },
+			usagePaste: { x: 0, y: 22 },
+			usageDrop: { x: 0, y: 24 },
 		},
 	};
 

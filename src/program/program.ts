@@ -2,6 +2,7 @@ import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Page
 import { MiniView, ZoomView, ImageView } from "../components";
 import { assetPath, readAsBuffer } from "../utils";
 import { getAppLayout } from "./layout";
+import * as Color from "color";	
 
 export class Program {
 	app: App;
@@ -14,6 +15,7 @@ export class Program {
 	colorView: ColorView;
 	txtPixelPos: TextBox;
 	txtRgba: TextBox;
+	txtHex: TextBox;
 	btnOpen: Button;
 	btnPaste: Button;
 	lockColor: boolean;
@@ -76,6 +78,7 @@ export class Program {
 
 			this.txtPixelPos = createTextBox();
 			this.txtRgba = createTextBox();
+			this.txtHex = createTextBox();
 
 			this.pager = new Pager(window);
 			this.pager.SetContent(this.imageView.control);
@@ -109,6 +112,7 @@ export class Program {
 
 		const marginLeft = new DpiMargin(DpiSize.FromPixelScaled(4), DpiSize.Zero, DpiSize.Zero, DpiSize.Zero);
 		pixelGrid.addControl(this.txtPixelPos, pixelGrid.areas.pixelPos).SetMargin(marginLeft);
+		pixelGrid.addControl(this.txtHex, pixelGrid.areas.pixelHex).SetMargin(marginLeft);
 		pixelGrid.addControl(this.txtRgba, pixelGrid.areas.pixelRgba).SetMargin(marginLeft);
 		pixelGrid.addControl(this.btnOpen, pixelGrid.areas.openFile);
 		pixelGrid.addControl(this.btnPaste, pixelGrid.areas.paste);
@@ -197,7 +201,9 @@ export class Program {
 
 		this.colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
 		this.txtPixelPos.SetText(`position: ${pos.x}, ${pos.y}`);
-		this.txtRgba.SetText(`rgba(${color.r},${color.g},${color.b},${color.a})`);
+		const rgba = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+		this.txtRgba.SetText(rgba);
+		this.txtHex.SetText(`hex: ${Color(rgba).hex()}`);
 	}
 
 	onPointerEvent() {
