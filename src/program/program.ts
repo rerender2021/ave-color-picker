@@ -25,8 +25,6 @@ export class Program {
 	constructor() {
 		this.app = new App();
 		this.i18n = initI18n(this.app);
-		// this.i18n.switch(CultureId.zh_cn);
-		this.i18n.switch(CultureId.en_us);
 
 		const cpWindow = new WindowCreation();
 		cpWindow.Title = "Color Picker";
@@ -93,11 +91,17 @@ export class Program {
 			window.SetContent(container);
 
 			const menuLang = new Menu(window);
-			// menuLang.OnClick((sender, nId) => {
-			// 	this.i18n.switch(nId - 1);
-			// });
-			menuLang.InsertItem(new MenuItem(CultureId.en_us + 1, MenuType.Text, 0, "English (US)"));
-			menuLang.InsertItem(new MenuItem(CultureId.zh_cn + 1, MenuType.Text, 0, "简体中文"));
+			menuLang.OnClick((menu, nId) => {
+				this.i18n.switch(nId - 1);
+				menu.SetRadioId(nId);
+			});
+
+			// the reason of +1: menu item id can't be 0, CultureId.en_us is 0
+			menuLang.InsertItem(new MenuItem(CultureId.en_us + 1, MenuType.Text, 0, this.app.GetCultureInfo(CultureId.en_us).NameNative));
+			menuLang.InsertItem(new MenuItem(CultureId.zh_cn + 1, MenuType.Text, 0, this.app.GetCultureInfo(CultureId.zh_cn).NameNative));
+
+			this.i18n.switch(CultureId.en_us);
+			menuLang.SetRadioId(CultureId.en_us + 1);
 
 			//
 			const toolbar = new ToolBar(window);
