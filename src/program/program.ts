@@ -211,7 +211,7 @@ export class Program {
 		console.log(pos, color);
 
 		this.colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
-		this.txtPixelPos.SetText(`position: ${pos.x}, ${pos.y}`);
+		this.txtPixelPos.SetText(this.i18n.t("Position", { x: pos.x, y: pos.y }));
 		const rgba = `rgba(${color.r},${color.g},${color.b},${color.a})`;
 		this.txtRgba.SetText(rgba);
 		this.txtHex.SetText(`hex: ${Color(rgba).hex()}`);
