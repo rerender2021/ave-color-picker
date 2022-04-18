@@ -1,4 +1,4 @@
-import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType, Menu, MenuItem, MenuType, AveGetClipboard, AveImage, ResourceSource } from "ave-ui";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType, Menu, MenuItem, MenuType, AveGetClipboard, ResourceSource, ThemeImage, ThemePredefined_Dark, ToolBarItemFlag } from "ave-ui";
 import { MiniView, ZoomView, ImageView } from "../components";
 import { assetPath } from "../utils";
 import { getAppLayout } from "./layout";
@@ -7,6 +7,9 @@ import { Ii18n, initI18n, KeyOfLang } from "./i18n";
 
 export class Program {
 	app: App;
+	theme: ThemeImage;
+	themeDark: ThemePredefined_Dark;
+	isDark: boolean;
 	window: Window;
 	i18n: Ii18n;
 
@@ -26,9 +29,14 @@ export class Program {
 		this.app = new App();
 		this.i18n = initI18n(this.app);
 
+		this.theme = new ThemeImage();
+		this.themeDark = new ThemePredefined_Dark();
+		this.isDark = false;
+
 		const cpWindow = new WindowCreation();
 		cpWindow.Title = "Color Picker";
 		cpWindow.Flag |= WindowFlag.Layered;
+		cpWindow.Theme = this.theme;
 
 		this.window = new Window(cpWindow);
 	}
@@ -50,6 +58,8 @@ export class Program {
 			WindowIcon: [assetPath("color-wheel.png")],
 			OpenFile: [assetPath("file-open.png")],
 			Language: [assetPath("language.png")],
+			Sun: [assetPath("sun.png")],
+			Moon: [assetPath("moon.png")],
 		};
 		const resMap = this.app.CreateResourceMap(this.app, [16], iconDataMap);
 
@@ -107,8 +117,30 @@ export class Program {
 			//
 			const toolbar = new ToolBar(window);
 			toolbar.SetBackground(false);
-			toolbar.ToolInsert(new ToolBarItem(1, ToolBarItemType.ButtonDrop, window.CacheIcon(new IconSource(resMap.Language, 16))), -1);
+			const ToolBarItemId = {
+				Lang: 1,
+				Theme: 2,
+			};
+			toolbar.ToolInsert(new ToolBarItem(ToolBarItemId.Lang, ToolBarItemType.ButtonDrop, window.CacheIcon(new IconSource(resMap.Language, 16))), -1);
+			const theme = new ToolBarItem(ToolBarItemId.Theme, ToolBarItemType.Button, window.CacheIcon(new IconSource(resMap.Sun, 16)));
+			toolbar.ToolInsert(theme, -1);
 			toolbar.DropSetById(1, menuLang);
+			toolbar.OnClick((sender, id) => {
+				if (id === ToolBarItemId.Theme) {
+					if (!this.isDark) {
+						this.themeDark.SetStyle(this.theme, 0); // switch to dark theme
+						theme.Flag = ToolBarItemFlag.Icon;
+						theme.Icon = window.CacheIcon(new IconSource(resMap.Moon, 16));
+						toolbar.ToolSetById(ToolBarItemId.Theme, theme);
+					} else {
+						this.theme.ResetTheme(); // reset to light theme
+						theme.Flag = ToolBarItemFlag.Icon;
+						theme.Icon = window.CacheIcon(new IconSource(resMap.Sun, 16));
+						toolbar.ToolSetById(ToolBarItemId.Theme, theme);
+					}
+					this.isDark = !this.isDark;
+				}
+			});
 			window.GetFrame().SetToolBarRight(toolbar);
 
 			this.openFile(assetPath("wallpaper.png"));
