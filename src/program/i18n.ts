@@ -4,6 +4,7 @@ export interface ILang {
 	// ave built-in language key
 	AppTitle: string;
 	CoOk: string;
+	__FontStd: string;
 
 	// user defined key
 	OpenFile: string;
@@ -30,11 +31,13 @@ export function initI18n(app: App) {
 		},
 		switch(this: Ii18n, id: CultureId) {
 			app.LangSetDefaultString(id, this.lang[id]);
+			app.LangSetCurrent(id);
 		},
 		lang: {
 			[CultureId.en_us]: {
 				AppTitle: "Color Picker",
 				CoOk: "OK",
+				__FontStd: "Segoe UI",
 				OpenFile: "Open File",
 				Paste: "Paste",
 				UsageMoveByPixel: "WSAD: Move by pixel",
@@ -46,6 +49,7 @@ export function initI18n(app: App) {
 			[CultureId.zh_cn]: {
 				AppTitle: "颜色选择器",
 				CoOk: "好的",
+				__FontStd: "Microsoft YaHei UI",
 				OpenFile: "选择图片",
 				Paste: "粘贴",
 				UsageMoveByPixel: "WSAD: 一次移动一像素",
