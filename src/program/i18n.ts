@@ -8,6 +8,11 @@ export interface ILang {
 	// user defined key
 	OpenFile: string;
 	Paste: string;
+	UsageMoveByPixel: string;
+	UsageLockColor: string;
+	UsageOpenFile: string;
+	UsagePaste: string;
+	UsageDrop: string;
 }
 
 export type KeyOfLang = keyof ILang;
@@ -29,15 +34,25 @@ export function initI18n(app: App) {
 		lang: {
 			[CultureId.en_us]: {
 				AppTitle: "Color Picker",
-                CoOk: "OK",
+				CoOk: "OK",
 				OpenFile: "Open File",
 				Paste: "Paste",
+				UsageMoveByPixel: "WSAD: Move by pixel",
+				UsageLockColor: "Space/Click: Lock result",
+				UsageOpenFile: "F: Open File",
+				UsagePaste: "V: Paste",
+				UsageDrop: "Drop an image to open"
 			},
 			[CultureId.zh_cn]: {
 				AppTitle: "颜色选择器",
-                CoOk: "好的",
+				CoOk: "好的",
 				OpenFile: "选择图片",
 				Paste: "粘贴",
+				UsageMoveByPixel: "WSAD: 一次移动一像素",
+				UsageLockColor: "Space/Click: 锁定取色结果",
+				UsageOpenFile: "F: 选择图片",
+				UsagePaste: "V: 粘贴",
+				UsageDrop: "支持拖拽扔进来一张图片"
 			},
 		},
 	};

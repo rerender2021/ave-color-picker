@@ -129,17 +129,16 @@ export class Program {
 		pixelGrid.addControl(this.btnOpen, pixelGrid.areas.openFile);
 		pixelGrid.addControl(this.btnPaste, pixelGrid.areas.paste);
 
-		const createLabel = (s: string) => {
-			const lbl = new Label(window);
-			lbl.SetText(s);
+		const createLabel = (key: KeyOfLang) => {
+			const lbl = new Label(window, key);
 			return lbl;
 		};
 
-		pixelGrid.addControl(createLabel("WSAD: Move by pixel"), pixelGrid.areas.usageMove).SetMargin(marginLeft);
-		pixelGrid.addControl(createLabel("Space/Click: Lock result"), pixelGrid.areas.usageLockColor).SetMargin(marginLeft);
-		pixelGrid.addControl(createLabel("F: Open File"), pixelGrid.areas.usageOpenFile).SetMargin(marginLeft);
-		pixelGrid.addControl(createLabel("V: Paste"), pixelGrid.areas.usagePaste).SetMargin(marginLeft);
-		pixelGrid.addControl(createLabel("Drop a png to open"), pixelGrid.areas.usageDrop).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsageMoveByPixel"), pixelGrid.areas.usageMove).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsageLockColor"), pixelGrid.areas.usageLockColor).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsageOpenFile"), pixelGrid.areas.usageOpenFile).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsagePaste"), pixelGrid.areas.usagePaste).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsageDrop"), pixelGrid.areas.usageDrop).SetMargin(marginLeft);
 
 		//
 		container.addControl(this.pager, container.areas.image);
