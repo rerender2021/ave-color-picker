@@ -235,12 +235,12 @@ export class Program {
 	openFile(file: string) {
 		const codec = this.app.GetImageCodec();
 		const aveImage = codec.Open(ResourceSource.FromFilePath(file));
-		// TODO: add from native
-		this.imageView.updateRawImage(AveImage.FromNative(aveImage));
+		this.imageView.updateRawImage(aveImage);
 		this.track();
 	}
 
 	track() {
+		this.lockColor = false;
 		this.zoomView.track({ image: this.imageView.native });
 		this.miniView.track({ pager: this.pager, image: this.imageView.native });
 		this.pager.SetContentSize(new Vec2(this.imageView.width, this.imageView.height));
