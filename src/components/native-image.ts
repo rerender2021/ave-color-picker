@@ -34,7 +34,7 @@ export class NativeRawImage extends Component implements INativeImage {
 	}
 
 	readPixel(x: number, y: number) {
-		const color = this.imgData.SafeGetPixel(x, y, 0);
+		const color = this.imgData.GetPixel(x, y, 0);
 		return {
 			r: color.r * 255,
 			g: color.g * 255,

@@ -247,7 +247,7 @@ export class Program {
 	}
 
 	async browseOpenFile() {
-		const s = await this.window.GetCommonUi().OpenFile([new SysDialogFilter("PNG Files", "*.png")], "png", "", "");
+		const s = await this.window.GetCommonUi().OpenFile([new SysDialogFilter("Image Files", "*.png;*.jpg;*jpeg")], "png", "", "");
 		if (null != s && s.length > 0) this.openFile(s);
 	}
 
@@ -259,7 +259,7 @@ export class Program {
 			this.track();
 		} else if (clipboard.HasFile()) {
 			const [file] = clipboard.GetFile();
-			if (file && file.endsWith("png")) {
+			if (file && ["png", "jpg", "jpeg"].some((extension) => file.endsWith(extension))) {
 				this.openFile(file);
 			}
 		}
