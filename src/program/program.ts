@@ -110,7 +110,7 @@ export class Program {
 			toolbar.DropSetById(1, menuLang);
 			window.GetFrame().SetToolBarRight(toolbar);
 
-			this.openFile(assetPath("wallpaper-full.png"));
+			this.openFile(assetPath("wallpaper.png"));
 			return true;
 		});
 	}
@@ -149,7 +149,7 @@ export class Program {
 
 	onDragDrop() {
 		this.window.OnDragMove((sender, dc) => {
-			if (1 == dc.FileGetCount() && dc.FileGet()[0].toLowerCase().endsWith(".png")) {
+			if (1 == dc.FileGetCount() && ["png", "jpg", "jpeg"].some((extension) => dc.FileGet()[0].toLowerCase().endsWith(extension))) {
 				dc.SetDropTip(DragDropImage.Copy, "Open this file");
 				dc.SetDropBehavior(DropBehavior.Copy);
 			}
@@ -247,7 +247,7 @@ export class Program {
 	}
 
 	async browseOpenFile() {
-		const s = await this.window.GetCommonUi().OpenFile([new SysDialogFilter("Image Files", "*.png;*.jpg;*jpeg")], "png", "", "");
+		const s = await this.window.GetCommonUi().OpenFile([new SysDialogFilter("Image Files", "*.png;*.jpg;*.jpeg")], "png", "", "");
 		if (null != s && s.length > 0) this.openFile(s);
 	}
 
