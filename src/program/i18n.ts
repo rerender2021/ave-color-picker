@@ -70,14 +70,3 @@ export function initI18n(app: App) {
 
 	return i18n;
 }
-
-// // prettier-ignore
-// this.app.LangSetDefaultString(CultureId.en_us, {
-// 	"CoOk"      /**/: "OK",
-// 	"CoCut"    	/**/: "Cut",
-// 	"CoCopy"   	/**/: "Copy",
-// 	"CoPaste"  	/**/: "Paste",
-// 	"CoDelete" 	/**/: "Delete",
-// 	"CoUndo"   	/**/: "Undo",
-// 	"CoSelAll" 	/**/: "Select All",
-// });

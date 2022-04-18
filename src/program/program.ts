@@ -44,6 +44,7 @@ export class Program {
 	onCreateContent() {
 		this.onDragDrop();
 		this.onHotKey();
+		this.onLanguageChange();
 
 		const iconDataMap = {
 			WindowIcon: [assetPath("color-wheel.png")],
@@ -202,6 +203,13 @@ export class Program {
 					this.pastePicture();
 					break;
 			}
+		});
+	}
+
+	onLanguageChange() {
+		this.window.OnLanguageChange((sender) => {
+			const pos = this.zoomView.pixelPos;
+			this.txtPixelPos.SetText(this.i18n.t("Position", { x: pos.x, y: pos.y }));
 		});
 	}
 

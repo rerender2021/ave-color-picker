@@ -8,7 +8,7 @@ export interface IZoomViewProps {
 export class ZoomView extends Component {
 	private view: Placeholder;
 	private image: Byo2Image;
-    private pixelPos: Vec2;
+	private _pixelPos: Vec2;
 
 	constructor(window: Window) {
 		super(window);
@@ -19,15 +19,19 @@ export class ZoomView extends Component {
 		return this.view;
 	}
 
+	get pixelPos() {
+		return this._pixelPos;
+	}
+
 	track(props: IZoomViewProps) {
 		const { image } = props;
 		this.image = image;
-        this.updatePixelPos(new Vec2(-1, -1));
+		this.updatePixelPos(new Vec2(-1, -1));
 	}
 
-    updatePixelPos(pos: Vec2) {
-        this.pixelPos = pos;
-    }
+	updatePixelPos(pos: Vec2) {
+		this._pixelPos = pos;
+	}
 
 	private onCreate() {
 		this.view = new Placeholder(this.window);
