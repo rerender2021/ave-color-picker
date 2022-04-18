@@ -1,10 +1,10 @@
-import { Picture, StretchMode, Window } from "ave-ui";
+import { AveImage, Picture, StretchMode, Window } from "ave-ui";
 import { Component } from "./component";
-import { NativeImage } from "./native-image";
+import { INativeImage, NativeRawImage } from "./native-image";
 
 export class ImageView extends Component {
 	private view: Picture;
-	private image: NativeImage;
+	private image: INativeImage;
 
 	constructor(window: Window) {
 		super(window);
@@ -26,7 +26,7 @@ export class ImageView extends Component {
 	get height() {
 		return this.image.native.GetHeight();
 	}
-	
+
 	readPixel(x: number, y: number) {
 		return this.image.readPixel(x, y);
 	}
@@ -36,8 +36,8 @@ export class ImageView extends Component {
 		this.view.SetStretchMode(StretchMode.Center);
 	}
 
-	updateImage(buffer: Buffer) {
-		this.image = new NativeImage(this.window, buffer);
+	updateRawImage(aveImage: AveImage) {
+		this.image = new NativeRawImage(this.window, aveImage);
 		this.view.SetImage(this.image.native);
 	}
 }

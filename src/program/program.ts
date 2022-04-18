@@ -1,12 +1,14 @@
-import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, MessageIcon, MessageButton, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout } from "ave-ui";
+import { App, WindowCreation, Window, WindowFlag, ColorView, Vec4, TextBox, Pager, Vec2, AlignType, Button, SysDialogFilter, DragDropImage, DropBehavior, KbKey, Rect, PointerButton, Label, DpiMargin, DpiSize, CultureId, IconSource, VisualTextLayout, ToolBar, ToolBarItem, ToolBarItemType, Menu, MenuItem, MenuType, AveGetClipboard, AveImage, ResourceSource } from "ave-ui";
 import { MiniView, ZoomView, ImageView } from "../components";
-import { assetPath, readAsBuffer } from "../utils";
+import { assetPath } from "../utils";
 import { getAppLayout } from "./layout";
-import * as Color from "color";	
+import * as Color from "color";
+import { Ii18n, initI18n, KeyOfLang } from "./i18n";
 
 export class Program {
 	app: App;
 	window: Window;
+	i18n: Ii18n;
 
 	imageView: ImageView;
 	pager: Pager;
@@ -22,16 +24,7 @@ export class Program {
 
 	constructor() {
 		this.app = new App();
-		// prettier-ignore
-		this.app.LangSetDefaultString(CultureId.en_us, {
-			"CoOk"      /**/: "OK",
-			"CoCut"    	/**/: "Cut",
-			"CoCopy"   	/**/: "Copy",
-			"CoPaste"  	/**/: "Paste",
-			"CoDelete" 	/**/: "Delete",
-			"CoUndo"   	/**/: "Undo",
-			"CoSelAll" 	/**/: "Select All",
-		});
+		this.i18n = initI18n(this.app);
 
 		const cpWindow = new WindowCreation();
 		cpWindow.Title = "Color Picker";
@@ -51,10 +44,12 @@ export class Program {
 	onCreateContent() {
 		this.onDragDrop();
 		this.onHotKey();
+		this.onLanguageChange();
 
 		const iconDataMap = {
 			WindowIcon: [assetPath("color-wheel.png")],
-			OpenFile: [assetPath("file-open.png")]
+			OpenFile: [assetPath("file-open.png")],
+			Language: [assetPath("language.png")],
 		};
 		const resMap = this.app.CreateResourceMap(this.app, [16], iconDataMap);
 
@@ -85,20 +80,38 @@ export class Program {
 			this.pager.SetContentHorizontalAlign(AlignType.Center);
 			this.pager.SetContentVerticalAlign(AlignType.Center);
 
-			this.btnOpen = new Button(window);
-			this.btnOpen.SetText("Open File");
+			this.btnOpen = new Button(window, "OpenFile" as KeyOfLang);
 			this.btnOpen.SetVisualTextLayout(VisualTextLayout.HorzVisualText);
-			this.btnOpen.SetVisual(window.CreateManagedIcon(new IconSource(resMap.OpenFile, 16)))
+			this.btnOpen.SetVisual(window.CreateManagedIcon(new IconSource(resMap.OpenFile, 16)));
 			this.btnOpen.OnClick(() => this.browseOpenFile());
 
-			this.btnPaste = new Button(window);
-			this.btnPaste.SetText("Paste");
+			this.btnPaste = new Button(window, "Paste" as KeyOfLang);
 			this.btnPaste.OnClick(() => this.pastePicture());
 
 			const container = this.onCreateLayout(window);
 			window.SetContent(container);
 
-			this.openFile(assetPath("wallpaper-full.png"));
+			const menuLang = new Menu(window);
+			menuLang.OnClick((menu, nId) => {
+				this.i18n.switch(nId - 1);
+				menu.SetRadioId(nId);
+			});
+
+			// the reason of +1: menu item id can't be 0, CultureId.en_us is 0
+			menuLang.InsertItem(new MenuItem(CultureId.en_us + 1, MenuType.Text, 0, this.app.GetCultureInfo(CultureId.en_us).NameNative));
+			menuLang.InsertItem(new MenuItem(CultureId.zh_cn + 1, MenuType.Text, 0, this.app.GetCultureInfo(CultureId.zh_cn).NameNative));
+
+			this.i18n.switch(CultureId.en_us);
+			menuLang.SetRadioId(CultureId.en_us + 1);
+
+			//
+			const toolbar = new ToolBar(window);
+			toolbar.SetBackground(false);
+			toolbar.ToolInsert(new ToolBarItem(1, ToolBarItemType.ButtonDrop, window.CacheIcon(new IconSource(resMap.Language, 16))), -1);
+			toolbar.DropSetById(1, menuLang);
+			window.GetFrame().SetToolBarRight(toolbar);
+
+			this.openFile(assetPath("wallpaper.png"));
 			return true;
 		});
 	}
@@ -117,17 +130,16 @@ export class Program {
 		pixelGrid.addControl(this.btnOpen, pixelGrid.areas.openFile);
 		pixelGrid.addControl(this.btnPaste, pixelGrid.areas.paste);
 
-		const createLabel = (s: string) => {
-			const lbl = new Label(window);
-			lbl.SetText(s);
+		const createLabel = (key: KeyOfLang) => {
+			const lbl = new Label(window, key);
 			return lbl;
 		};
 
-		pixelGrid.addControl(createLabel("WSAD: Move by pixel"), pixelGrid.areas.usageMove).SetMargin(marginLeft);
-		pixelGrid.addControl(createLabel("Space/Click: Lock result"), pixelGrid.areas.usageLockColor).SetMargin(marginLeft);
-		pixelGrid.addControl(createLabel("F: Open File"), pixelGrid.areas.usageOpenFile).SetMargin(marginLeft);
-		pixelGrid.addControl(createLabel("V: Paste"), pixelGrid.areas.usagePaste).SetMargin(marginLeft);
-		pixelGrid.addControl(createLabel("Drop a png to open"), pixelGrid.areas.usageDrop).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsageMoveByPixel"), pixelGrid.areas.usageMove).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsageLockColor"), pixelGrid.areas.usageLockColor).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsageOpenFile"), pixelGrid.areas.usageOpenFile).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsagePaste"), pixelGrid.areas.usagePaste).SetMargin(marginLeft);
+		pixelGrid.addControl(createLabel("UsageDrop"), pixelGrid.areas.usageDrop).SetMargin(marginLeft);
 
 		//
 		container.addControl(this.pager, container.areas.image);
@@ -137,7 +149,7 @@ export class Program {
 
 	onDragDrop() {
 		this.window.OnDragMove((sender, dc) => {
-			if (1 == dc.FileGetCount() && dc.FileGet()[0].toLowerCase().endsWith(".png")) {
+			if (1 == dc.FileGetCount() && ["png", "jpg", "jpeg"].some((extension) => dc.FileGet()[0].toLowerCase().endsWith(extension))) {
 				dc.SetDropTip(DragDropImage.Copy, "Open this file");
 				dc.SetDropBehavior(DropBehavior.Copy);
 			}
@@ -194,13 +206,20 @@ export class Program {
 		});
 	}
 
+	onLanguageChange() {
+		this.window.OnLanguageChange((sender) => {
+			const pos = this.zoomView.pixelPos;
+			this.txtPixelPos.SetText(this.i18n.t("Position", { x: pos.x, y: pos.y }));
+		});
+	}
+
 	onPointerMove(pos: Vec2) {
 		this.zoomView.updatePixelPos(pos);
 		const color = this.imageView.readPixel(pos.x, pos.y);
 		console.log(pos, color);
 
 		this.colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
-		this.txtPixelPos.SetText(`position: ${pos.x}, ${pos.y}`);
+		this.txtPixelPos.SetText(this.i18n.t("Position", { x: pos.x, y: pos.y }));
 		const rgba = `rgba(${color.r},${color.g},${color.b},${color.a})`;
 		this.txtRgba.SetText(rgba);
 		this.txtHex.SetText(`hex: ${Color(rgba).hex()}`);
@@ -219,20 +238,37 @@ export class Program {
 			if (!this.lockColor) this.onPointerMove(mp.Position);
 		});
 	}
-	
+
 	openFile(file: string) {
-		this.imageView.updateImage(readAsBuffer(file));
+		const codec = this.app.GetImageCodec();
+		const aveImage = codec.Open(ResourceSource.FromFilePath(file));
+		this.imageView.updateRawImage(aveImage);
+		this.track();
+	}
+
+	track() {
+		this.lockColor = false;
 		this.zoomView.track({ image: this.imageView.native });
 		this.miniView.track({ pager: this.pager, image: this.imageView.native });
 		this.pager.SetContentSize(new Vec2(this.imageView.width, this.imageView.height));
 	}
 
 	async browseOpenFile() {
-		const s = await this.window.GetCommonUi().OpenFile([new SysDialogFilter("PNG Files", "*.png")], "png", "", "");
+		const s = await this.window.GetCommonUi().OpenFile([new SysDialogFilter("Image Files", "*.png;*.jpg;*.jpeg")], "png", "", "");
 		if (null != s && s.length > 0) this.openFile(s);
 	}
 
 	pastePicture() {
-		this.window.GetCommonUi().Message("TODO: Paste picture from clipboard.", "", MessageIcon.None, MessageButton.Ok, "color-picker");
+		const clipboard = AveGetClipboard();
+		if (clipboard.HasImage()) {
+			const aveImage = clipboard.GetImage();
+			this.imageView.updateRawImage(aveImage);
+			this.track();
+		} else if (clipboard.HasFile()) {
+			const [file] = clipboard.GetFile();
+			if (file && ["png", "jpg", "jpeg"].some((extension) => file.endsWith(extension))) {
+				this.openFile(file);
+			}
+		}
 	}
 }

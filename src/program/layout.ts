@@ -4,7 +4,7 @@ import { GridLayout } from "../components";
 export function getAppLayout(window: Window) {
 	const containerLayout = {
 		rows: "1",
-		columns: "1 128dpx",
+		columns: "1 192dpx",
 		areas: {
 			image: { x: 0, y: 0 },
 			pixel: { x: 1, y: 0 },
@@ -15,7 +15,7 @@ export function getAppLayout(window: Window) {
 		// prettier-ignore
 		rows: [
 			"128dpx", /* mini view  */ "4dpx",
-			"128dpx", /* zoom view  */ "4dpx",
+			"192dpx", /* zoom view  */ "4dpx",
 			"32dpx",  /* color view */ "4dpx",
 			"16dpx",  /* pixel pos  */ "4dpx",
 			"16dpx",  /* pixel hex */ "4dpx",
