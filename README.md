@@ -1,26 +1,53 @@
 <p align="center">
-  <a href="https://qber-soft.github.io/Ave-Nodejs-Docs/">
-    <img width="200" src="https://qber-soft.github.io/Ave-Nodejs-Docs/img/Ave.svg">
-  </a>
+    <img width="200" src="./assets/color-wheel.png">
 </p>
 
-<h1 align="center">Avernakis UI Template</h1>
+<h1 align="center">Color Picker</h1>
 
-<div align="center">
+English | [简体中文](./README_zh-cn.md)
 
- </div>
- 
 # Introduction
 
-This is the template project of Ave.
+This is the tutorial project of [Avernakis UI](https://github.com/qber-soft/Ave-Nodejs). 
 
-Docs: [https://qber-soft.github.io/Ave-Nodejs-Docs/](https://qber-soft.github.io/Ave-Nodejs-Docs/)
+Tiny, but production ready.
+
+![pick color](./docs/images/pick-color.gif)
+
+# Features
+
+-   basic controls: button, label, icon, toolbar, ...
+-   custom component: mini view, pixel view
+-   event: mouse, keyboard
+-   hot key / shortcut
+
+-   drag to drop
+
+![drag-to-drop](./docs/images/drag-to-drop.gif)
+
+-   clipboard
+
+![clipboard](./docs/images/clipboard.gif)
+
+-   theme
+
+![theme](./docs/images/theme.gif)
+
+-   i18n
+
+![i18n](./docs/images/i18n.gif)
 
 ## Dev
 
 ```bash
 > npm install
 > npm run dev
+```
+
+## Package
+
+```bash
+> npm run release
 ```
 
 ## License
