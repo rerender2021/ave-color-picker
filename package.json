@@ -1,7 +1,7 @@
 {
   "name": "ave-color-picker",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple color picker powered by avernakis.",
   "scripts": {
     "dev": "tsnd --respawn ./src/index.ts",
     "prebuild": "del-cli ./build",
@@ -10,7 +10,7 @@
     "prerelease": "npm run build",
     "release": "ave-pack pack"
   },
-  "author": "",
+  "author": "ivjtk; rerender2021",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.21",
