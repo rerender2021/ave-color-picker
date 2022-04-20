@@ -4,6 +4,7 @@ import { assetPath } from "../utils";
 import { getAppLayout } from "./layout";
 import * as Color from "color";
 import { Ii18n, initI18n, KeyOfLang } from "./i18n";
+import * as fs from "fs";
 
 export class Program {
 	app: App;
@@ -273,7 +274,8 @@ export class Program {
 
 	openFile(file: string) {
 		const codec = this.app.GetImageCodec();
-		const aveImage = codec.Open(ResourceSource.FromFilePath(file));
+		const resourceSource = ResourceSource.FromBuffer(fs.readFileSync(file));
+		const aveImage = codec.Open(resourceSource);
 		this.imageView.updateRawImage(aveImage);
 		this.track();
 	}
