@@ -35,6 +35,24 @@
 
 ![i18n](./docs/images/i18n.gif)
 
+# 安装
+
+把 npm 当作应用管理器吧！
+
+> Use npm as nam! (Node App Manager)
+
+像安装 CLI 一样安装:
+
+```bash
+> npm i -g ave-color-picker
+```
+
+但是这次将启动桌面应用程序：
+
+```bash
+> color-picker
+```
+
 ## 开发
 
 ```bash

@@ -14,6 +14,20 @@ Tiny, but production ready.
 
 ![pick color](./docs/images/pick-color.gif)
 
+# Install
+
+Use npm as nam! (Node App Manager)
+
+```bash
+> npm i -g ave-color-picker
+```
+
+Run:
+
+```bash
+> color-picker
+```
+
 # Features
 
 -   basic controls: button, label, icon, toolbar, ...
