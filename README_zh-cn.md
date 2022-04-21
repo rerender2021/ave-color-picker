@@ -8,7 +8,7 @@
 
 # 简介
 
-这是 [Avernakis UI](https://github.com/qber-soft/Ave-Nodejs) 的教学演示项目：
+这是 [Avernakis UI](https://qber-soft.github.io/Ave-Nodejs-Docs/) 的教学演示项目：
 
 ![pick color](./docs/images/pick-color.gif)
 

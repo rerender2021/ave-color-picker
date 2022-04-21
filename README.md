@@ -8,7 +8,7 @@ English | [简体中文](./README_zh-cn.md)
 
 # Introduction
 
-This is the tutorial project of [Avernakis UI](https://github.com/qber-soft/Ave-Nodejs). 
+This is the tutorial project of [Avernakis UI](https://qber-soft.github.io/Ave-Nodejs-Docs/). 
 
 Tiny, but production ready.
 
