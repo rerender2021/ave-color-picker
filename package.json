@@ -2,12 +2,24 @@
   "name": "ave-color-picker",
   "version": "1.0.0",
   "description": "A simple color picker powered by avernakis.",
+  "keywords": [
+		"gui",
+		"desktop",
+		"avernakis",
+		"ave",
+    "color picker"
+	],
   "bin": {
     "color-picker": "bin/script/cli.js"
   },
   "files": [
     "bin"
   ],
+  "homepage": "https://github.com/rerender2021/ave-color-picker",
+  "repository": {
+		"type": "git",
+		"url": "https://github.com/rerender2021/ave-color-picker"
+	},
   "scripts": {
     "dev": "tsnd --respawn ./src/index.ts",
     "prebuild": "del-cli ./build",
