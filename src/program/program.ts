@@ -249,7 +249,7 @@ export class Program {
 	onPointerMove(pos: Vec2) {
 		this.zoomView.updatePixelPos(pos);
 		const color = this.imageView.readPixel(pos.x, pos.y);
-		console.log(pos, color);
+		//console.log(pos, color);
 
 		this.colorView.SetSolidColor(new Vec4(color.r, color.g, color.b, color.a));
 		this.txtPixelPos.SetText(this.i18n.t("Position", { x: pos.x, y: pos.y }));
@@ -259,17 +259,40 @@ export class Program {
 	}
 
 	onPointerEvent() {
+		let bMoving = false;
+		let bMoved = false;
+		let vPressPointerPos = Vec2.Zero;
+		let vPressScrollPos = Vec2.Zero;
 		this.imageView.control.OnPointerEnter((sender, mp) => {
 			this.lockColor = false;
 		});
 		this.imageView.control.OnPointerPress((sender, mp) => {
 			if (mp.Button == PointerButton.First) {
-				this.lockColor = !this.lockColor;
+				bMoving = true;
+				bMoved = false;
+				vPressPointerPos = this.window.GetPlatform().PointerGetPosition();
+				vPressScrollPos = this.pager.GetScrollPosition();
+			}
+		});
+		this.imageView.control.OnPointerRelease((sender, mp) => {
+			if (mp.Button == PointerButton.First) {
+				bMoving = false;
+				if (!bMoved)
+					this.lockColor = !this.lockColor;
 			}
 		});
 		this.imageView.control.OnPointerMove((sender, mp) => {
-			if (!this.lockColor) this.onPointerMove(mp.Position);
+			if (bMoving) {
+				bMoved = true;
+				const vPos = this.window.GetPlatform().PointerGetPosition();
+				this.pager.SetScrollPosition(vPressScrollPos.Add(vPos.Sub(vPressPointerPos)), false);
+				this.window.Update();
+			}
+			else if (!this.lockColor) this.onPointerMove(mp.Position);
 		});
+		// this.imageView.control.OnPaintPost((sender, painter, rc) => {
+		// 	console.log(this.window.GetTime());
+		// });
 	}
 
 	openFile(file: string) {
